@@ -72,7 +72,10 @@ the editor this model will be updated.
             event = eventsArray[_i];
             scope.$on(event, function() {
               return $timeout(function() {
-                return scope.editor.resize();
+                scope.editor.resize();
+                if (scope.aceModel != null) {
+                  return scope.editor.getSession().setValue(scope.$eval(scope.aceModel));
+                }
               });
             });
           }
@@ -83,6 +86,7 @@ the editor this model will be updated.
           if (attrs["aceResizeEvents"] != null) {
             attachResizeEvents(attrs["aceResizeEvents"]);
           }
+          console.log("element: :: " + element);
           scope.editor = ace.edit(element[0]);
           scope.editor.setTheme("ace/theme/" + attrs["aceTheme"]);
           mode = attrs["aceMode"];
