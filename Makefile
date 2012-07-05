@@ -21,4 +21,8 @@ build: js
 test: build
 	testacular-run
 
+prepare_example: build
+	cp build/${PROJECT_NAME}.js example/src/main/webapp/js/${PROJECT_NAME}.js
+	echo "now cd to example and enter 'mvn jetty:run'"
+
 .PHONY: all coffee js css build
