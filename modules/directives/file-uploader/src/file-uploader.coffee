@@ -4,36 +4,37 @@ file-uploader - a directive for providing a file upload utility.
 Usage:
 	<a file-uploader fu-url="/file-upload" fu-name="my-file">add file</a>
 
+Events:
+  "uploadStarted"  (event) ->  : fired when uploading has started
+  "uploadCompleted" (event, serverResponse)-> : fired when uploading is completed
+
 Dependencies: JQuery
 
 TODO: Support file drag and drop
 ###
 
-
-
 angular.module('cs.directives').directive('fileUploader', ($rootScope) ->
   definition = 
     replace: false
     link: (scope, element, attrs) ->
-      console.log "file upload"
 
+      fuUid = "file_upload_input_#{Math.round( Math.random() * 10000 )}"
+      $fuHiddenInput = null
 
-      uploadClick = ->
-        console.log "uploadClick"
-        element.unbind 'click'
-        $(element).find('input').trigger 'click' 
+      uploadClick = -> $fuHiddenInput.trigger 'click'
 
       createFileInput = ->
-        #style="width: 1px; height: 1px;" 
         scope.fileInput = """<input 
                 type="file" 
+                id="#{fuUid}"
+                style="width: 1px; height: 1px; visibility: hidden;" 
                 name="#{attrs.fuName}">
          </input>"""
-        $(element).append scope.fileInput
-
-        $(element).find('input').change (event) => handleFileSelect event
+        $(element).parent().append scope.fileInput
+        $fuHiddenInput = $(element).parent().find("##{fuUid}")
+        $fuHiddenInput.change (event) => handleFileSelect event
         null
-
+ 
       handleFileSelect = (event) ->
         files = event.target.files
         file = event.target.files[0]

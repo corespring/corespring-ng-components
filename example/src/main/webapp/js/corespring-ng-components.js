@@ -123,6 +123,10 @@ file-uploader - a directive for providing a file upload utility.
 Usage:
 	<a file-uploader fu-url="/file-upload" fu-name="my-file">add file</a>
 
+Events:
+  "uploadStarted"  (event) ->  : fired when uploading has started
+  "uploadCompleted" (event, serverResponse)-> : fired when uploading is completed
+
 Dependencies: JQuery
 
 TODO: Support file drag and drop
@@ -136,18 +140,18 @@ TODO: Support file drag and drop
     definition = {
       replace: false,
       link: function(scope, element, attrs) {
-        var createFileInput, handleFileSelect, onLocalFileLoadEnd, uploadClick;
-        console.log("file upload");
+        var $fuHiddenInput, createFileInput, fuUid, handleFileSelect, onLocalFileLoadEnd, uploadClick;
+        fuUid = "file_upload_input_" + (Math.round(Math.random() * 10000));
+        $fuHiddenInput = null;
         uploadClick = function() {
-          console.log("uploadClick");
-          element.unbind('click');
-          return $(element).find('input').trigger('click');
+          return $fuHiddenInput.trigger('click');
         };
         createFileInput = function() {
           var _this = this;
-          scope.fileInput = "<input \n       type=\"file\" \n       name=\"" + attrs.fuName + "\">\n</input>";
-          $(element).append(scope.fileInput);
-          $(element).find('input').change(function(event) {
+          scope.fileInput = "<input \n       type=\"file\" \n       id=\"" + fuUid + "\"\n       style=\"width: 1px; height: 1px; visibility: hidden;\" \n       name=\"" + attrs.fuName + "\">\n</input>";
+          $(element).parent().append(scope.fileInput);
+          $fuHiddenInput = $(element).parent().find("#" + fuUid);
+          $fuHiddenInput.change(function(event) {
             return handleFileSelect(event);
           });
           return null;
