@@ -55,7 +55,6 @@ angular.module('cs.directives').directive('aceEditor', ($timeout) ->
         if attrs["aceResizeEvents"]? 
           attachResizeEvents(attrs["aceResizeEvents"])
 
-        console.log("element: :: " + element )    
         scope.editor = ace.edit(element[0])
         scope.editor.getSession().setUseWrapMode(true)
         scope.editor.setTheme("ace/theme/" + attrs["aceTheme"])

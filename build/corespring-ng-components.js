@@ -93,7 +93,6 @@ the editor this model will be updated.
           if (attrs["aceResizeEvents"] != null) {
             attachResizeEvents(attrs["aceResizeEvents"]);
           }
-          console.log("element: :: " + element);
           scope.editor = ace.edit(element[0]);
           scope.editor.getSession().setUseWrapMode(true);
           scope.editor.setTheme("ace/theme/" + attrs["aceTheme"]);
@@ -123,6 +122,14 @@ file-uploader - a directive for providing a file upload utility.
 Usage:
 	<a file-uploader fu-url="/file-upload" fu-name="my-file">add file</a>
 
+  @params
+    fu-url (string or name of function on scope)
+    fu-name (the item name [only relevant for multipart upload])
+    fu-mode (raw|multipart [default: multipart]) 
+      raw places the data directly into the content body
+      multipart create the 'content flags' eg:  'content-disposition', 'boundary'
+    fu-max-size the max size in kB that a user can upload (default: 200)
+
 Events:
   "uploadStarted"  (event) ->  : fired when uploading has started
   "uploadCompleted" (event, serverResponse)-> : fired when uploading is completed
@@ -140,7 +147,13 @@ TODO: Support file drag and drop
     definition = {
       replace: false,
       link: function(scope, element, attrs) {
-        var $fuHiddenInput, createFileInput, fuUid, handleFileSelect, onLocalFileLoadEnd, uploadClick;
+        var $fuHiddenInput, createFileInput, fuUid, handleFileSelect, maxSize, maxSizeKb, mode, onLocalFileLoadEnd, uploadClick;
+        mode = "multipart";
+        if (attrs.fuMode === "raw") {
+          mode = "raw";
+        }
+        maxSizeKb = parseInt(attrs.fuMaxSize) || 200;
+        maxSize = maxSizeKb * 1024;
         fuUid = "file_upload_input_" + (Math.round(Math.random() * 10000));
         $fuHiddenInput = null;
         uploadClick = function() {
@@ -173,12 +186,19 @@ TODO: Support file drag and drop
         */
 
         onLocalFileLoadEnd = function(file, event) {
-          var name, options, uploader, url,
+          var callback, name, options, uploader, url,
             _this = this;
-          if (file.size > 100 * 1024) {
+          if (file.size > maxSize) {
+            $rootScope.$broadcast("fileSizeGreaterThanMax", file, maxSizeKb);
             return;
           }
           url = attrs.fuUrl;
+          if (attrs.fuUrl.indexOf("()") !== -1) {
+            callback = attrs.fuUrl.replace("(", "").replace(")", "");
+            if (typeof scope[callback] === "function") {
+              url = scope[callback](file);
+            }
+          }
           name = attrs.fuName;
           options = {
             onLoadStart: function() {
@@ -188,7 +208,12 @@ TODO: Support file drag and drop
               return $rootScope.$broadcast("uploadCompleted", responseText);
             }
           };
-          uploader = new com.ee.MultipartFileUploader(file, event.target.result, url, name, options);
+          if (mode === "raw") {
+            uploader = new com.ee.RawFileUploader(file, event.target.result, url, name, options);
+          } else {
+            uploader = new com.ee.MultipartFileUploader(file, event.target.result, url, name, options);
+          }
+          uploader.beginUpload();
           return null;
         };
         createFileInput();
@@ -227,39 +252,106 @@ https://github.com/edeustace/inplace-image-changer
 
   com.ee || (com.ee = {});
 
-  this.com.ee.MultipartFileUploader = (function() {
+  /*
+  Simplifies the xhr upload api
+  */
 
-    function MultipartFileUploader(file, binaryData, url, name, options) {
-      var boundary, formBody, now, xhr,
+
+  this.com.ee.XHRWrapper = (function() {
+
+    function XHRWrapper(file, formBody, url, name, options) {
+      var now,
         _this = this;
+      this.file = file;
+      this.formBody = formBody;
+      this.url = url;
+      this.name = name;
+      this.options = options;
+      formBody = this.binaryData;
+      now = new Date().getTime();
+      this.request = new XMLHttpRequest();
+      this.request.upload.index = 0;
+      this.request.upload.file = this.file;
+      this.request.upload.downloadStartTime = now;
+      this.request.upload.currentStart = now;
+      this.request.upload.currentProgress = 0;
+      this.request.upload.startData = 0;
+      this.request.open("POST", this.url, true);
+      this.request.setRequestHeader("Accept", "application/json");
+      if (this.options.onLoadStart != null) {
+        this.options.onLoadStart();
+      }
+      this.request.onload = function() {
+        if (_this.options.onUploadComplete != null) {
+          return _this.options.onUploadComplete(_this.request.responseText);
+        }
+      };
+    }
+
+    XHRWrapper.prototype.setRequestHeader = function(name, value) {
+      this.request.setRequestHeader(name, value);
+      return null;
+    };
+
+    XHRWrapper.prototype.beginUpload = function() {
+      this.request.sendAsBinary(this.formBody);
+      return null;
+    };
+
+    return XHRWrapper;
+
+  })();
+
+  /*
+  Place the binary data directly into the request body.
+  */
+
+
+  this.com.ee.RawFileUploader = (function() {
+
+    function RawFileUploader(file, binaryData, url, name, options) {
       this.file = file;
       this.binaryData = binaryData;
       this.url = url;
       this.name = name;
       this.options = options;
-      now = new Date().getTime();
-      boundary = "------multipartformboundary" + now;
-      formBody = this._buildMultipartFormBody(this.file, this.binaryData, boundary);
-      xhr = new XMLHttpRequest();
-      xhr.upload.index = 0;
-      xhr.upload.file = this.file;
-      xhr.upload.downloadStartTime = now;
-      xhr.upload.currentStart = now;
-      xhr.upload.currentProgress = 0;
-      xhr.upload.startData = 0;
-      xhr.open("POST", this.url, true);
-      xhr.setRequestHeader('content-type', "multipart/form-data; boundary=" + boundary);
-      xhr.setRequestHeader("Accept", "application/json");
-      xhr.sendAsBinary(formBody);
-      if (this.options.onLoadStart != null) {
-        this.options.onLoadStart();
-      }
-      xhr.onload = function() {
-        if (_this.options.onUploadComplete != null) {
-          return _this.options.onUploadComplete(xhr.responseText);
-        }
-      };
+      this.xhr = new com.ee.XHRWrapper(this.file, this.binaryData, this.url, this.name, this.options);
+      this.xhr.setRequestHeader("Accept", "application/json");
     }
+
+    RawFileUploader.prototype.beginUpload = function() {
+      return this.xhr.beginUpload();
+    };
+
+    return RawFileUploader;
+
+  })();
+
+  /*
+  Build up a multipart form data request body
+  */
+
+
+  this.com.ee.MultipartFileUploader = (function() {
+
+    function MultipartFileUploader(file, binaryData, url, name, options) {
+      var boundary, formBody, uid;
+      this.file = file;
+      this.binaryData = binaryData;
+      this.url = url;
+      this.name = name;
+      this.options = options;
+      uid = Math.floor(Math.random() * 100000);
+      boundary = "------multipartformboundary" + uid;
+      formBody = this._buildMultipartFormBody(this.file, this.binaryData, boundary);
+      this.xhr = new com.ee.XHRWrapper(this.file, formBody, this.url, this.name, this.options);
+      this.xhr.setRequestHeader('content-type', "multipart/form-data; boundary=" + boundary);
+      this.xhr.setRequestHeader("Accept", "application/json");
+    }
+
+    MultipartFileUploader.prototype.beginUpload = function() {
+      return this.xhr.beginUpload();
+    };
 
     MultipartFileUploader.prototype._buildMultipartFormBody = function(file, fileBinaryData, boundary) {
       var fileParams, formBuilder, params;
