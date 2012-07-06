@@ -59,7 +59,9 @@ the editor this model will be updated.
             throw "Cannot apply to null object the property:  " + property + " with value: " + value;
           }
           if (property.indexOf(".") === -1) {
-            obj[property] = value;
+            scope.$apply(function() {
+              return obj[property] = value;
+            });
           } else {
             props = property.split(".");
             nextProp = props.shift();
@@ -93,7 +95,6 @@ the editor this model will be updated.
           if (attrs["aceResizeEvents"] != null) {
             attachResizeEvents(attrs["aceResizeEvents"]);
           }
-          console.log("element: :: " + element);
           scope.editor = ace.edit(element[0]);
           scope.editor.getSession().setUseWrapMode(true);
           scope.editor.setTheme("ace/theme/" + attrs["aceTheme"]);
@@ -123,6 +124,14 @@ file-uploader - a directive for providing a file upload utility.
 Usage:
 	<a file-uploader fu-url="/file-upload" fu-name="my-file">add file</a>
 
+  @params
+    fu-url (string or name of function on scope)
+    fu-name (the item name [only relevant for multipart upload])
+    fu-mode (raw|multipart [default: multipart]) 
+      raw places the data directly into the content body
+      multipart create the 'content flags' eg:  'content-disposition', 'boundary'
+    fu-max-size the max size in kB that a user can upload (default: 200)
+
 Events:
   "uploadStarted"  (event) ->  : fired when uploading has started
   "uploadCompleted" (event, serverResponse)-> : fired when uploading is completed
@@ -140,11 +149,13 @@ TODO: Support file drag and drop
     definition = {
       replace: false,
       link: function(scope, element, attrs) {
-        var $fuHiddenInput, createFileInput, fuUid, handleFileSelect, mode, onLocalFileLoadEnd, uploadClick;
+        var $fuHiddenInput, createFileInput, fuUid, handleFileSelect, maxSize, maxSizeKb, mode, onLocalFileLoadEnd, uploadClick;
         mode = "multipart";
         if (attrs.fuMode === "raw") {
           mode = "raw";
         }
+        maxSizeKb = parseInt(attrs.fuMaxSize) || 200;
+        maxSize = maxSizeKb * 1024;
         fuUid = "file_upload_input_" + (Math.round(Math.random() * 10000));
         $fuHiddenInput = null;
         uploadClick = function() {
@@ -177,12 +188,19 @@ TODO: Support file drag and drop
         */
 
         onLocalFileLoadEnd = function(file, event) {
-          var name, options, uploader, url,
+          var callback, name, options, uploader, url,
             _this = this;
-          if (file.size > 100 * 1024) {
+          if (file.size > maxSize) {
+            $rootScope.$broadcast("fileSizeGreaterThanMax", file, maxSizeKb);
             return;
           }
           url = attrs.fuUrl;
+          if (attrs.fuUrl.indexOf("()") !== -1) {
+            callback = attrs.fuUrl.replace("(", "").replace(")", "");
+            if (typeof scope[callback] === "function") {
+              url = scope[callback](file);
+            }
+          }
           name = attrs.fuName;
           options = {
             onLoadStart: function() {

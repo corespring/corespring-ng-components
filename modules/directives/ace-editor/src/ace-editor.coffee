@@ -28,7 +28,8 @@ angular.module('cs.directives').directive('aceEditor', ($timeout) ->
           throw "Cannot apply to null object the property:  " + property + " with value: " + value 
 
         if property.indexOf(".") == -1 
-          obj[property] = value
+          scope.$apply ->
+            obj[property] = value
         else
           props = property.split(".")
           nextProp = props.shift()

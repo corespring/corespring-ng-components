@@ -38,10 +38,12 @@ angular.module('cs.directives').directive('fileUploader', ($rootScope) ->
       uploadClick = -> $fuHiddenInput.trigger 'click'
 
       createFileInput = ->
+
+        styleDef = "position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; visibility: hidden; padding: 0px; margin: 0px; line-height: 0px;" 
         scope.fileInput = """<input 
                 type="file" 
                 id="#{fuUid}"
-                style="width: 1px; height: 1px; visibility: hidden;" 
+                style="#{styleDef}" 
                 name="#{attrs.fuName}">
          </input>"""
         $(element).parent().append scope.fileInput

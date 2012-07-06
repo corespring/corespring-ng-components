@@ -59,7 +59,9 @@ the editor this model will be updated.
             throw "Cannot apply to null object the property:  " + property + " with value: " + value;
           }
           if (property.indexOf(".") === -1) {
-            obj[property] = value;
+            scope.$apply(function() {
+              return obj[property] = value;
+            });
           } else {
             props = property.split(".");
             nextProp = props.shift();
@@ -160,8 +162,10 @@ TODO: Support file drag and drop
           return $fuHiddenInput.trigger('click');
         };
         createFileInput = function() {
-          var _this = this;
-          scope.fileInput = "<input \n       type=\"file\" \n       id=\"" + fuUid + "\"\n       style=\"width: 1px; height: 1px; visibility: hidden;\" \n       name=\"" + attrs.fuName + "\">\n</input>";
+          var styleDef,
+            _this = this;
+          styleDef = "position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; visibility: hidden; padding: 0px; margin: 0px; line-height: 0px;";
+          scope.fileInput = "<input \n       type=\"file\" \n       id=\"" + fuUid + "\"\n       style=\"" + styleDef + "\" \n       name=\"" + attrs.fuName + "\">\n</input>";
           $(element).parent().append(scope.fileInput);
           $fuHiddenInput = $(element).parent().find("#" + fuUid);
           $fuHiddenInput.change(function(event) {
