@@ -12,3 +12,20 @@ A callback handler when the pge is scrolled
 ## File Uploader
 A directive that adds file upload capabilities (Requires FileReader support)
 
+
+# Building
+You'll need coffeescript installed
+    make
+
+## Running Tests
+### Developer mode
+    npm install --global testacular
+    testacular test/test-config-1.0.js
+    testacular-run
+
+or 
+    make test
+
+### Continuous Integration mode
+    ./test/phantomjs.runner.sh test/jasmine-junit-testrunner.html
+
