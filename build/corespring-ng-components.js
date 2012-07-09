@@ -34,7 +34,7 @@ dependencies:
 ace.js + whatever theme and mode you wish to use
 @param ace-model - a ng model that contains the text to display in the editor. When the code is changed in
 the editor this model will be updated.
-@param ace-resize-trigger - a property that requires the editor to resize itself
+@param ace-resize-events - a comma delimited list of ng events that that should trigger a resize
 @param ace-theme - an ace theme - loads them using "ace/theme/" + the them you specify. (you need to include the js for it)
 @param ace-mode - an ace mode - as above loads a mode.
 */
@@ -52,7 +52,7 @@ the editor this model will be updated.
               Apply a nested value..
         */
 
-        var applyValue, attachResizeEvents;
+        var AceMode, applyValue, attachResizeEvents, initialData, mode, theme;
         applyValue = function(obj, property, value) {
           var nextProp, props;
           if (!(obj != null)) {
@@ -90,26 +90,24 @@ the editor this model will be updated.
           }
           return null;
         };
-        return $timeout(function() {
-          var AceMode, initialData, mode;
-          if (attrs["aceResizeEvents"] != null) {
-            attachResizeEvents(attrs["aceResizeEvents"]);
-          }
-          scope.editor = ace.edit(element[0]);
-          scope.editor.getSession().setUseWrapMode(true);
-          scope.editor.setTheme("ace/theme/" + attrs["aceTheme"]);
-          mode = attrs["aceMode"];
-          AceMode = require('ace/mode/' + mode).Mode;
-          scope.editor.getSession().setMode(new AceMode());
-          scope.aceModel = attrs["aceModel"];
-          initialData = scope.$eval(scope.aceModel);
-          scope.editor.getSession().setValue(initialData);
-          return scope.editor.getSession().on("change", function() {
-            var newValue;
-            newValue = scope.editor.getSession().getValue();
-            return applyValue(scope, scope.aceModel, newValue);
-          });
-        }, 250);
+        if (attrs["aceResizeEvents"] != null) {
+          attachResizeEvents(attrs["aceResizeEvents"]);
+        }
+        scope.editor = ace.edit(element[0]);
+        scope.editor.getSession().setUseWrapMode(true);
+        theme = attrs["aceTheme"] || "eclipse";
+        scope.editor.setTheme("ace/theme/" + theme);
+        mode = attrs["aceMode"] || "xml";
+        AceMode = require('ace/mode/' + mode).Mode;
+        scope.editor.getSession().setMode(new AceMode());
+        scope.aceModel = attrs["aceModel"];
+        initialData = scope.$eval(scope.aceModel);
+        scope.editor.getSession().setValue(initialData);
+        return scope.editor.getSession().on("change", function() {
+          var newValue;
+          newValue = scope.editor.getSession().getValue();
+          return applyValue(scope, scope.aceModel, newValue);
+        });
       }
     };
     return definition;
