@@ -5,6 +5,8 @@ describe 'aceEditor', ()->
 
   describe 'create editor', ()->
 
+    it 'should fail here', ->
+      expect(true).toBe(false)
 
     it 'should have an ace editor attached and ready', ()->
       inject ($compile, $rootScope, $timeout)->

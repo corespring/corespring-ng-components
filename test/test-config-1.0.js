@@ -11,6 +11,9 @@ basePath = '..';
 files = [
   JASMINE,
   JASMINE_ADAPTER,
+  'test/lib/jasmine-reporters/jasmine.junit_reporter.js',
+  'test/lib/jasmine-reporters/TrivialReporter.js',
+  'test/lib/jasmine-reporters/init.jasmine.junit.js',
   'test/lib/jquery/jquery-1.7.2.js',
   'test/lib/jquery/jquery-ui-1.8.18.js',
   'test/lib/angular-1.0/angular.js',

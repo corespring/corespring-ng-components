@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>JUnit XML Reporter Spec</title>
+    <link rel="stylesheet" href="lib/jasmine-1.2.0/jasmine.css" type="text/css" />
+    <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine-html.js"></script>
+    <script type="text/javascript" src="lib/jasmine-reporters/jasmine.junit_reporter.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery-1.7.2.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery-ui-1.8.18.js"></script>
+    <script type="text/javascript" src="lib/angular-1.0/angular.js"></script>
+    <script type="text/javascript" src="lib/angular-1.0/angular-mocks.js"></script>
+    <script type="text/javascript" src="../example/src/main/webapp/js/ace/ace.js"></script>
+    <script type="text/javascript" src="../example/src/main/webapp/js/ace/mode-xml.js"></script>
+    <script type="text/javascript" src="../example/src/main/webapp/js/ace/theme-eclipse.js"></script>
+    <script type="text/javascript" src="../common/src/_header.js"></script>
+    <script type="text/javascript" src="../common/src/module.js"></script>
+    <script type="text/javascript" src="../modules/directives/ace-editor/src/ace-editor.js"></script>
+    <script type="text/javascript" src="../modules/directives/ace-editor/test/ace-editor-spec.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+        jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter());
+        jasmine.getEnv().execute();
+    </script>
+</body>
+</html>
