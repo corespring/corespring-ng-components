@@ -1,0 +1,24 @@
+<html ng:app="typeAheadTaggerExampleApp">
+<head>
+  <script type="text/javascript" src="http://code.angularjs.org/1.0.1/angular-1.0.1.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+
+  <script type="text/javascript" src="js/bootstrap/js/bootstrap.js"></script>
+  <script type="text/javascript" src="js/bootstrap/js/TypeAheadFork.js"></script>
+  <script type="text/javascript" src="js/corespring-ng-components.js"></script>
+  <script type="text/javascript" src="js/typeahead-tagger-example.js"></script>
+  <link href="js/bootstrap/css/bootstrap.css" rel="stylesheet"/>
+
+</head>
+<body ng:controller="MainController">
+
+
+  <div typeahead  
+        tt-source="lookupSubject" 
+        tt-addTag="addTag"
+        tt-property="name"/>
+
+</body>
+</html>
