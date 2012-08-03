@@ -52,8 +52,22 @@ angular.module('cs.directives').directive('aceEditor', ($timeout) ->
         null
 
 
+      onExceptionsChanged = (newValue, oldValue) ->
+
+        if oldValue?
+          for exception in oldValue
+            scope.editor.renderer.removeGutterDecoration (exception.lineNumber - 1), "ace_failed"
+        if newValue?
+          for exception in newValue
+            scope.editor.renderer.addGutterDecoration (exception.lineNumber - 1), "ace_failed" 
+
+        null
+
       if attrs["aceResizeEvents"]? 
         attachResizeEvents(attrs["aceResizeEvents"])
+
+      if attrs["aceExceptions"]?
+        scope.$watch(attrs["aceExceptions"], onExceptionsChanged)
 
       scope.editor = ace.edit(element[0])
       scope.editor.getSession().setUseWrapMode(true)
@@ -68,11 +82,14 @@ angular.module('cs.directives').directive('aceEditor', ($timeout) ->
       scope.aceModel = attrs["aceModel"]
       initialData = scope.$eval(scope.aceModel)
 
+
       scope.editor.getSession().setValue(initialData)
 
       scope.editor.getSession().on "change", -> 
         newValue = scope.editor.getSession().getValue()
         applyValue(scope, scope.aceModel, newValue)
+        null
+
 
   definition
 )
