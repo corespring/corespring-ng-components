@@ -1,8 +1,8 @@
 
-# case insensitive contains
-if !jQuery.expr[':'].contains_ci
-  jQuery.expr[':'].contains_ci = (a, i, m) -> 
-    jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0 
+# case insensitive string match 
+if !jQuery.expr[':'].matches_ci
+  jQuery.expr[':'].matches_ci = (a, i, m) ->
+    jQuery(a).text().toUpperCase() == m[3].toUpperCase()
 
 
 angular.module('cs.directives').directive('tagList', ($timeout) -> 
@@ -28,7 +28,7 @@ angular.module('cs.directives').directive('tagList', ($timeout) ->
         $(element).find("." + linkClass).removeClass('selected')
 
         for selectedTag in selectedTags
-          $link = $(element).find("a:contains_ci('"+selectedTag+"')")
+          $link = $(element).find("a:matches_ci('"+selectedTag+"')")
           $link.addClass("selected")
         null
 
