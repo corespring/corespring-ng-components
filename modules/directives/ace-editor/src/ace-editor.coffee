@@ -75,19 +75,49 @@ angular.module('cs.directives').directive('aceEditor', ($timeout) ->
       theme = attrs["aceTheme"] || "eclipse"
       scope.editor.setTheme("ace/theme/" + theme )
 
-      mode = attrs["aceMode"] || "xml"
-      AceMode = require('ace/mode/' + mode).Mode
-      scope.editor.getSession().setMode(new AceMode())
+      scope.$watch attrs["aceMode"], (newValue,oldValue) ->
+        return if !newValue?
+        return if !scope.editor?
+
+        newValue = "javascript" if newValue == "js"
+        modeFactory = require("ace/mode/#{newValue}")
+        return if !modeFactory?
+          
+        AceMode = modeFactory.Mode
+        scope.editor.getSession().setMode(new AceMode())
+        null
+
+      #mode = attrs["aceMode"] || "xml"
 
       scope.aceModel = attrs["aceModel"]
+
+      scope.$watch scope.aceModel, (newValue, oldValue) ->
+        if scope.changeFromEditor
+          return 
+
+        #console.log "new value: " + newValue 
+        $timeout ->
+          scope.suppressChange = true 
+          scope.editor.getSession().setValue( newValue )
+          scope.suppressChange = false 
+          null
+        null
+
       initialData = scope.$eval(scope.aceModel)
 
 
       scope.editor.getSession().setValue(initialData)
 
       scope.editor.getSession().on "change", -> 
+
+        if scope.suppressChange
+          return
+
+        scope.changeFromEditor = true
+
         newValue = scope.editor.getSession().getValue()
         applyValue(scope, scope.aceModel, newValue)
+        scope.changeFromEditor = false
         null
 
 

@@ -52,7 +52,7 @@ the editor this model will be updated.
               Apply a nested value..
         */
 
-        var AceMode, applyValue, attachResizeEvents, initialData, mode, onExceptionsChanged, theme;
+        var applyValue, attachResizeEvents, initialData, onExceptionsChanged, theme;
         applyValue = function(obj, property, value) {
           var nextProp, props;
           if (!(obj != null)) {
@@ -116,16 +116,49 @@ the editor this model will be updated.
         scope.editor.getSession().setUseWrapMode(true);
         theme = attrs["aceTheme"] || "eclipse";
         scope.editor.setTheme("ace/theme/" + theme);
-        mode = attrs["aceMode"] || "xml";
-        AceMode = require('ace/mode/' + mode).Mode;
-        scope.editor.getSession().setMode(new AceMode());
+        scope.$watch(attrs["aceMode"], function(newValue, oldValue) {
+          var AceMode, modeFactory;
+          if (!(newValue != null)) {
+            return;
+          }
+          if (!(scope.editor != null)) {
+            return;
+          }
+          if (newValue === "js") {
+            newValue = "javascript";
+          }
+          modeFactory = require("ace/mode/" + newValue);
+          if (!(modeFactory != null)) {
+            return;
+          }
+          AceMode = modeFactory.Mode;
+          scope.editor.getSession().setMode(new AceMode());
+          return null;
+        });
         scope.aceModel = attrs["aceModel"];
+        scope.$watch(scope.aceModel, function(newValue, oldValue) {
+          if (scope.changeFromEditor) {
+            return;
+          }
+          $timeout(function() {
+            scope.suppressChange = true;
+            scope.editor.getSession().setValue(newValue);
+            scope.suppressChange = false;
+            return null;
+          });
+          return null;
+        });
         initialData = scope.$eval(scope.aceModel);
         scope.editor.getSession().setValue(initialData);
         return scope.editor.getSession().on("change", function() {
           var newValue;
+          if (scope.suppressChange) {
+            return;
+          }
+          scope.changeFromEditor = true;
           newValue = scope.editor.getSession().getValue();
           applyValue(scope, scope.aceModel, newValue);
+          scope.changeFromEditor = false;
           return null;
         });
       }
@@ -211,6 +244,9 @@ TODO: Support file drag and drop
           var callback, name, options, uploader, url,
             _this = this;
           if (file.size > maxSize) {
+            if (scope[attrs["fuFileSizeGreaterThanMax"]] != null) {
+              scope[attrs["fuFileSizeGreaterThanMax"]](file, maxSizeKb);
+            }
             $rootScope.$broadcast("fileSizeGreaterThanMax", file, maxSizeKb);
             return;
           }
@@ -227,6 +263,9 @@ TODO: Support file drag and drop
               return $rootScope.$broadcast("uploadStarted");
             },
             onUploadComplete: function(responseText) {
+              if (scope[attrs["fuUploadCompleted"]] != null) {
+                scope[attrs["fuUploadCompleted"]](responseText);
+              }
               return $rootScope.$broadcast("uploadCompleted", responseText);
             }
           };

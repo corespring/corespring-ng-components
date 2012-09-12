@@ -64,7 +64,9 @@ angular.module('cs.directives').directive('fileUploader', ($rootScope) ->
       ###
       onLocalFileLoadEnd = (file, event) ->
         if file.size > maxSize
+          scope[attrs["fuFileSizeGreaterThanMax"]](file, maxSizeKb) if scope[attrs["fuFileSizeGreaterThanMax"]]?
           $rootScope.$broadcast "fileSizeGreaterThanMax", file, maxSizeKb
+          # TODO: Bug with the input change event here if the file is too big
           return
      
         # default to a static url 
@@ -83,6 +85,7 @@ angular.module('cs.directives').directive('fileUploader', ($rootScope) ->
           onLoadStart : =>
             $rootScope.$broadcast "uploadStarted"
           onUploadComplete : (responseText) =>
+            scope[attrs["fuUploadCompleted"]](responseText) if scope[attrs["fuUploadCompleted"]]?
             $rootScope.$broadcast "uploadCompleted", responseText
 
         if mode == "raw"
