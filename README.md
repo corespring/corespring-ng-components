@@ -12,7 +12,9 @@ A callback handler when the pge is scrolled
 ## File Uploader
 A directive that adds file upload capabilities (Requires FileReader support)
 
-
+# When developing:
+    coffee --watch --join example/src/main/webapp/js/corespring-ng-components.js --compile common/**/*.coffee modules/**/src/*.coffee
+    
 # Building
 You'll need coffeescript installed
     make
