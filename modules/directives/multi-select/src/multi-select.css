@@ -1,0 +1,11 @@
+.multi-select{
+
+}
+
+.multi-select > .no-items {
+  background-color: #994499;
+}
+
+.multi-select > .chooser {
+  position: absolute;
+}
