@@ -538,85 +538,117 @@ Corespring Angular components (corespring-ng-components)
   ]);
 
   angular.module('cs.directives').directive('multiSelect', function($timeout) {
-    var definition;
-    definition = {
-      replace: true,
-      restrict: 'A',
-      scope: 'isolate',
-      template: "<span class=\"multi-select\">\n  <span class=\"items\" ng-click=\"showChooser=!showChooser\">\n    <span class=\"item\" ng-bind-html-unsafe=\"multiGetSelectedTitle(selected)\"></span>\n  </span>\n  <div class=\"chooser\" ng-show=\"showChooser\">\n   <ul>\n     <li ng-repeat=\"o in options\" >\n       <input type=\"checkbox\" ng-click=\"toggleItem(o)\"></input>\n       {{multiGetTitle(o)}}\n     </li>\n   </ul>\n  </div>\n</span>",
-      link: function(scope, element, attrs) {
-        var applyValue, changeCallback, getSelectedTitleProp, getTitleProp, modelProp, optionsProp;
-        console.log("multi-select");
-        optionsProp = attrs['multiOptions'];
-        modelProp = attrs['multiModel'];
-        getTitleProp = attrs['multiGetTitle'];
-        getSelectedTitleProp = attrs['multiGetSelectedTitle'];
-        changeCallback = attrs['multiChange'];
-        scope.noneSelected = "None selected";
-        scope.showChooser = false;
-        scope.$watch(optionsProp, function(newValue) {
-          scope.options = newValue;
-          return null;
-        });
-        scope.$watch(modelProp, function(newValue) {
-          scope.selected = newValue;
-          if (changeCallback != null) {
-            scope[changeCallback]();
-          }
-          return null;
-        });
-        /*
-              Apply a nested value..
-        */
+    var compile, definition, link, template;
+    template = "<span class=\"multi-select\">\n  <div \n    class=\"items\" \n    ng-click=\"showChooser=!showChooser\"\n    ng-bind-html-unsafe=\"multiGetSelectedTitle(selected)\">\n  </div>\n  <div class=\"chooser\" ng-show=\"showChooser\">\n   <ul>\n     <li ng-repeat=\"o in options\" >\n       <input type=\"checkbox\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\"></input>\n       {{multiGetTitle(o)}}\n     </li>\n   </ul>\n  </div>\n</span>";
+    /*
+      Linking function
+    */
 
-        applyValue = function(obj, property, value) {
-          var nextProp, props;
-          if (!(obj != null)) {
-            throw "Cannot apply to null object the property:  " + property + " with value: " + value;
-          }
-          if (property.indexOf(".") === -1) {
-            obj[property] = value;
-          } else {
-            props = property.split(".");
-            nextProp = props.shift();
-            applyValue(obj[nextProp], props.join("."), value);
-          }
-          return null;
-        };
-        /*
-              Need to use $eval to support nested values
-        */
-
-        scope.toggleItem = function(i) {
-          var arr, index, optionIndex, sortFn;
-          if (!(scope.$eval(modelProp) != null)) {
-            applyValue(scope, modelProp, []);
-          }
-          arr = scope.$eval(modelProp);
-          index = arr.indexOf(i);
-          optionIndex = scope.$eval(optionsProp).indexOf(i);
-          if (index === -1) {
-            arr.push(i);
-          } else {
-            arr.splice(index, 1);
-          }
-          sortFn = function(a, b) {
-            var aIndex, bIndex;
-            aIndex = scope.$eval(optionsProp).indexOf(a);
-            bIndex = scope.$eval(optionsProp).indexOf(b);
-            return aIndex - bIndex;
-          };
-          applyValue(scope, modelProp, arr.sort(sortFn));
-          return null;
-        };
-        scope.multiGetSelectedTitle = function(items) {
-          return scope[getSelectedTitleProp](items);
-        };
-        scope.multiGetTitle = function(t) {
-          return scope[getTitleProp](t);
-        };
+    link = function(scope, element, attrs) {
+      var applyValue, changeCallback, getSelectedTitleProp, getTitleProp, modelProp, optionsProp, uidKey, updateSelection;
+      optionsProp = attrs['multiOptions'];
+      uidKey = attrs['multiUid'] || "key";
+      modelProp = attrs['multiModel'];
+      getTitleProp = attrs['multiGetTitle'];
+      getSelectedTitleProp = attrs['multiGetSelectedTitle'];
+      changeCallback = attrs['multiChange'];
+      scope.noneSelected = "None selected";
+      scope.showChooser = false;
+      scope.$watch(optionsProp, function(newValue) {
+        scope.options = newValue;
+        updateSelection();
         return null;
-      }
+      });
+      scope.$watch(modelProp, function(newValue) {
+        scope.selected = newValue;
+        updateSelection();
+        return null;
+      });
+      updateSelection = function() {
+        var x, _i, _len, _ref;
+        if (!(scope.selected != null)) {
+          return null;
+        }
+        scope.selectedArr = {};
+        _ref = scope.selected;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          x = _ref[_i];
+          if (x[uidKey]) {
+            scope.selectedArr[x[uidKey]] = true;
+          }
+        }
+        return null;
+      };
+      /*
+          Apply a nested value..
+      */
+
+      applyValue = function(obj, property, value) {
+        var nextProp, props;
+        if (!(obj != null)) {
+          throw "Cannot apply to null object the property:  " + property + " with value: " + value;
+        }
+        if (property.indexOf(".") === -1) {
+          obj[property] = value;
+        } else {
+          props = property.split(".");
+          nextProp = props.shift();
+          applyValue(obj[nextProp], props.join("."), value);
+        }
+        return null;
+      };
+      /*
+          Need to use $eval to support nested values
+      */
+
+      scope.toggleItem = function(i) {
+        var arr, index, optionIndex, sortFn;
+        if (!(scope.$eval(modelProp) != null)) {
+          applyValue(scope, modelProp, []);
+        }
+        arr = scope.$eval(modelProp);
+        index = arr.indexOf(i);
+        optionIndex = scope.$eval(optionsProp).indexOf(i);
+        if (index === -1) {
+          arr.push(i);
+        } else {
+          arr.splice(index, 1);
+        }
+        sortFn = function(a, b) {
+          var aIndex, bIndex;
+          aIndex = scope.$eval(optionsProp).indexOf(a);
+          bIndex = scope.$eval(optionsProp).indexOf(b);
+          return aIndex - bIndex;
+        };
+        applyValue(scope, modelProp, arr.sort(sortFn));
+        if (changeCallback != null) {
+          scope[changeCallback]();
+        }
+        return null;
+      };
+      scope.multiGetSelectedTitle = function(items) {
+        return scope[getSelectedTitleProp](items);
+      };
+      scope.multiGetTitle = function(t) {
+        return scope[getTitleProp](t);
+      };
+      return null;
+    };
+    /*
+      Fix up the template to use the uid key for the ng-model.
+    */
+
+    compile = function(element, attrs, transclude) {
+      var prepped, uidKey;
+      uidKey = attrs['multiUid'] || "key";
+      prepped = template.replace("${uidKey}", uidKey);
+      element.html(prepped);
+      return link;
+    };
+    definition = {
+      restrict: 'A',
+      compile: compile,
+      scope: 'isolate'
     };
     return definition;
   });
@@ -710,25 +742,52 @@ Corespring Angular components (corespring-ng-components)
   */
 
 
+  /*
+  infinite scrolling module
+  Triggers a callback to the $scope.
+  Usage: 
+  <div when-scrolled="doSomething()" scrolled-mode="div|window(default)"/>
+  */
+
+
   angular.module('cs.directives').directive('whenScrolled', function() {
-    var fn;
-    fn = function(scope, elm, attr) {
-      var funCheckBounds, raw;
-      raw = elm[0];
-      funCheckBounds = function() {
+    var linkFn;
+    linkFn = function($scope, $elm, $attrs) {
+      var mode, onDivScroll, onWindowScroll, raw;
+      raw = $elm[0];
+      onDivScroll = function() {
+        var rectObject, scrollTop, scrolledTotal;
+        rectObject = raw.getBoundingClientRect();
+        if (rectObject.height === 0) {
+          return;
+        }
+        scrollTop = $elm.scrollTop();
+        scrolledTotal = $elm.scrollTop() + $elm.innerHeight();
+        if (scrolledTotal >= raw.scrollHeight) {
+          $scope.$apply($attrs.whenScrolled);
+        }
+        return null;
+      };
+      onWindowScroll = function() {
         var rectObject;
         rectObject = raw.getBoundingClientRect();
         if (rectObject.height === 0) {
           return;
         }
         if (rectObject.bottom <= window.innerHeight) {
-          scope.$apply(attr.whenScrolled);
+          $scope.$apply($attrs.whenScrolled);
         }
         return null;
       };
-      return angular.element(window).bind('scroll', funCheckBounds);
+      mode = $attrs['scrolledMode'] || 'window';
+      if (mode === "window") {
+        angular.element(window).bind('scroll', onWindowScroll);
+      } else {
+        $elm.bind('scroll', onDivScroll);
+      }
+      return null;
     };
-    return fn;
+    return linkFn;
   });
 
 }).call(this);

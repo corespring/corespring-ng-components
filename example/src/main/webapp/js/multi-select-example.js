@@ -6,7 +6,10 @@ var MainController = function($scope){
   $scope.options = [ {key:"1", value: "1"}];
 
   $scope.s = {};
-  $scope.s.selected = null;
+  $scope.s.selected = [{
+            "key":"PK",
+            "value":"Prekindergarten"
+        }];
 
   $scope.getTitle = function(o){
     return o.key;
@@ -27,7 +30,8 @@ var MainController = function($scope){
   $scope.example.gradeLevels = [
         {
             "key":"PK",
-            "value":"Prekindergarten"
+            "value":"Prekindergarten",
+            "selected" : true
         },
         {
             "key":"KG",
