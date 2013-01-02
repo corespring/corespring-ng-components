@@ -17,7 +17,7 @@ usage:
               multi-model="searchParams.collection">
             </span>
 ###
-angular.module('cs.directives').directive('multiSelect', ($timeout) -> 
+angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', ($timeout, Utils) -> 
 
   template = """<span class="multi-select">
                    <div 
@@ -55,7 +55,7 @@ angular.module('cs.directives').directive('multiSelect', ($timeout) ->
       null
 
     scope.$watch modelProp, (newValue) ->
-      scope.selected = newValue 
+      scope.selected = newValue if newValue?
       updateSelection() 
       null
 
@@ -70,31 +70,23 @@ angular.module('cs.directives').directive('multiSelect', ($timeout) ->
 
       null
 
-    ###
-    Apply a nested value..
-    ###
-    applyValue = (obj, property, value) ->
-      if !obj?
-        throw "Cannot apply to null object the property:  " + property + " with value: " + value 
-
-      if property.indexOf(".") == -1 
-        obj[property] = value
-      else
-        props = property.split(".")
-        nextProp = props.shift()
-        applyValue(obj[nextProp], props.join("."), value )
-      null
 
     ###
     Need to use $eval to support nested values
     ###
     scope.toggleItem = (i) ->
-      
+
+      getIndexById = (arr, item) ->
+        for arrItem, index in arr 
+          if arrItem[uidKey] and arrItem[uidKey] == item[uidKey]
+            return index 
+        -1
+
       if !scope.$eval(modelProp)?
-        applyValue(scope, modelProp, []) 
+        Utils.applyValue(scope, modelProp, []) 
       
       arr = scope.$eval(modelProp)
-      index = arr.indexOf(i)
+      index = getIndexById(arr,i)
       optionIndex = scope.$eval(optionsProp).indexOf(i)
       
       if index == -1
@@ -107,7 +99,7 @@ angular.module('cs.directives').directive('multiSelect', ($timeout) ->
         bIndex = scope.$eval(optionsProp).indexOf(b)
         aIndex - bIndex
 
-      applyValue scope, modelProp, arr.sort(sortFn)
+      Utils.applyValue scope, modelProp, arr.sort(sortFn)
       scope[changeCallback]() if changeCallback?
       null
 
@@ -133,5 +125,5 @@ angular.module('cs.directives').directive('multiSelect', ($timeout) ->
     scope: 'isolate',
 
   definition
-)
+])
 

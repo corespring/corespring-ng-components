@@ -175,7 +175,8 @@ the editor this model will be updated.
   Confirm popup. depends on angular-ui + bootstrap
 
   Usage: 
-    <div confirm-popup ng-model="selected">
+    <div confirm-popup ng-model="selected"
+      confirmed="onConfirmed" cancelled="onCancelled">
     <h2>remove?</h2>
     <p>Are you sure?</p>
     <button id="confirm">Yes</button>
@@ -227,7 +228,7 @@ the editor this model will be updated.
         elm.on('shown', function() {
           return elm.find("[autofocus]").focus();
         });
-        return console.log("confirm popup");
+        return null;
       };
       definition = {
         require: 'ngModel',
@@ -665,121 +666,117 @@ usage:
 
 (function() {
 
-  angular.module('cs.directives').directive('multiSelect', function($timeout) {
-    var compile, definition, link, template;
-    template = "<span class=\"multi-select\">\n  <div \n    class=\"items\" \n    ng-click=\"showChooser=!showChooser\"\n    ng-bind-html-unsafe=\"multiGetSelectedTitle(selected)\">\n  </div>\n  <div class=\"chooser\" ng-show=\"showChooser\">\n   <ul>\n     <li ng-repeat=\"o in options\" >\n       <input type=\"checkbox\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\"></input>\n       {{multiGetTitle(o)}}\n     </li>\n   </ul>\n  </div>\n</span>";
-    /*
-      Linking function
-    */
+  angular.module('cs.directives').directive('multiSelect', [
+    '$timeout', 'Utils', function($timeout, Utils) {
+      var compile, definition, link, template;
+      template = "<span class=\"multi-select\">\n  <div \n    class=\"items\" \n    ng-click=\"showChooser=!showChooser\"\n    ng-bind-html-unsafe=\"multiGetSelectedTitle(selected)\">\n  </div>\n  <div class=\"chooser\" ng-show=\"showChooser\">\n   <ul>\n     <li ng-repeat=\"o in options\" >\n       <input type=\"checkbox\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\"></input>\n       {{multiGetTitle(o)}}\n     </li>\n   </ul>\n  </div>\n</span>";
+      /*
+        Linking function
+      */
 
-    link = function(scope, element, attrs) {
-      var applyValue, changeCallback, getSelectedTitleProp, getTitleProp, modelProp, optionsProp, uidKey, updateSelection;
-      optionsProp = attrs['multiOptions'];
-      uidKey = attrs['multiUid'] || "key";
-      modelProp = attrs['multiModel'];
-      getTitleProp = attrs['multiGetTitle'];
-      getSelectedTitleProp = attrs['multiGetSelectedTitle'];
-      changeCallback = attrs['multiChange'];
-      scope.noneSelected = "None selected";
-      scope.showChooser = false;
-      scope.$watch(optionsProp, function(newValue) {
-        scope.options = newValue;
-        updateSelection();
-        return null;
-      });
-      scope.$watch(modelProp, function(newValue) {
-        scope.selected = newValue;
-        updateSelection();
-        return null;
-      });
-      updateSelection = function() {
-        var x, _i, _len, _ref;
-        if (!(scope.selected != null)) {
+      link = function(scope, element, attrs) {
+        var changeCallback, getSelectedTitleProp, getTitleProp, modelProp, optionsProp, uidKey, updateSelection;
+        optionsProp = attrs['multiOptions'];
+        uidKey = attrs['multiUid'] || "key";
+        modelProp = attrs['multiModel'];
+        getTitleProp = attrs['multiGetTitle'];
+        getSelectedTitleProp = attrs['multiGetSelectedTitle'];
+        changeCallback = attrs['multiChange'];
+        scope.noneSelected = "None selected";
+        scope.showChooser = false;
+        scope.$watch(optionsProp, function(newValue) {
+          scope.options = newValue;
+          updateSelection();
           return null;
-        }
-        scope.selectedArr = {};
-        _ref = scope.selected;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          x = _ref[_i];
-          if (x[uidKey]) {
-            scope.selectedArr[x[uidKey]] = true;
+        });
+        scope.$watch(modelProp, function(newValue) {
+          if (newValue != null) {
+            scope.selected = newValue;
           }
-        }
-        return null;
-      };
-      /*
-          Apply a nested value..
-      */
-
-      applyValue = function(obj, property, value) {
-        var nextProp, props;
-        if (!(obj != null)) {
-          throw "Cannot apply to null object the property:  " + property + " with value: " + value;
-        }
-        if (property.indexOf(".") === -1) {
-          obj[property] = value;
-        } else {
-          props = property.split(".");
-          nextProp = props.shift();
-          applyValue(obj[nextProp], props.join("."), value);
-        }
-        return null;
-      };
-      /*
-          Need to use $eval to support nested values
-      */
-
-      scope.toggleItem = function(i) {
-        var arr, index, optionIndex, sortFn;
-        if (!(scope.$eval(modelProp) != null)) {
-          applyValue(scope, modelProp, []);
-        }
-        arr = scope.$eval(modelProp);
-        index = arr.indexOf(i);
-        optionIndex = scope.$eval(optionsProp).indexOf(i);
-        if (index === -1) {
-          arr.push(i);
-        } else {
-          arr.splice(index, 1);
-        }
-        sortFn = function(a, b) {
-          var aIndex, bIndex;
-          aIndex = scope.$eval(optionsProp).indexOf(a);
-          bIndex = scope.$eval(optionsProp).indexOf(b);
-          return aIndex - bIndex;
+          updateSelection();
+          return null;
+        });
+        updateSelection = function() {
+          var x, _i, _len, _ref;
+          if (!(scope.selected != null)) {
+            return null;
+          }
+          scope.selectedArr = {};
+          _ref = scope.selected;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            x = _ref[_i];
+            if (x[uidKey]) {
+              scope.selectedArr[x[uidKey]] = true;
+            }
+          }
+          return null;
         };
-        applyValue(scope, modelProp, arr.sort(sortFn));
-        if (changeCallback != null) {
-          scope[changeCallback]();
-        }
+        /*
+            Need to use $eval to support nested values
+        */
+
+        scope.toggleItem = function(i) {
+          var arr, getIndexById, index, optionIndex, sortFn;
+          getIndexById = function(arr, item) {
+            var arrItem, index, _i, _len;
+            for (index = _i = 0, _len = arr.length; _i < _len; index = ++_i) {
+              arrItem = arr[index];
+              if (arrItem[uidKey] && arrItem[uidKey] === item[uidKey]) {
+                return index;
+              }
+            }
+            return -1;
+          };
+          if (!(scope.$eval(modelProp) != null)) {
+            Utils.applyValue(scope, modelProp, []);
+          }
+          arr = scope.$eval(modelProp);
+          index = getIndexById(arr, i);
+          optionIndex = scope.$eval(optionsProp).indexOf(i);
+          if (index === -1) {
+            arr.push(i);
+          } else {
+            arr.splice(index, 1);
+          }
+          sortFn = function(a, b) {
+            var aIndex, bIndex;
+            aIndex = scope.$eval(optionsProp).indexOf(a);
+            bIndex = scope.$eval(optionsProp).indexOf(b);
+            return aIndex - bIndex;
+          };
+          Utils.applyValue(scope, modelProp, arr.sort(sortFn));
+          if (changeCallback != null) {
+            scope[changeCallback]();
+          }
+          return null;
+        };
+        scope.multiGetSelectedTitle = function(items) {
+          return scope[getSelectedTitleProp](items);
+        };
+        scope.multiGetTitle = function(t) {
+          return scope[getTitleProp](t);
+        };
         return null;
       };
-      scope.multiGetSelectedTitle = function(items) {
-        return scope[getSelectedTitleProp](items);
-      };
-      scope.multiGetTitle = function(t) {
-        return scope[getTitleProp](t);
-      };
-      return null;
-    };
-    /*
-      Fix up the template to use the uid key for the ng-model.
-    */
+      /*
+        Fix up the template to use the uid key for the ng-model.
+      */
 
-    compile = function(element, attrs, transclude) {
-      var prepped, uidKey;
-      uidKey = attrs['multiUid'] || "key";
-      prepped = template.replace("${uidKey}", uidKey);
-      element.html(prepped);
-      return link;
-    };
-    definition = {
-      restrict: 'A',
-      compile: compile,
-      scope: 'isolate'
-    };
-    return definition;
-  });
+      compile = function(element, attrs, transclude) {
+        var prepped, uidKey;
+        uidKey = attrs['multiUid'] || "key";
+        prepped = template.replace("${uidKey}", uidKey);
+        element.html(prepped);
+        return link;
+      };
+      definition = {
+        restrict: 'A',
+        compile: compile,
+        scope: 'isolate'
+      };
+      return definition;
+    }
+  ]);
 
 }).call(this);
 // Generated by CoffeeScript 1.3.3

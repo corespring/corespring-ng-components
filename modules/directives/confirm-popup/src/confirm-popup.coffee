@@ -2,7 +2,8 @@
   Confirm popup. depends on angular-ui + bootstrap
 
   Usage: 
-    <div confirm-popup ng-model="selected">
+    <div confirm-popup ng-model="selected"
+      confirmed="onConfirmed" cancelled="onCancelled">
     <h2>remove?</h2>
     <p>Are you sure?</p>
     <button id="confirm">Yes</button>
@@ -43,8 +44,8 @@ angular.module('cs.directives').directive('confirmPopup', ['$timeout', 'Utils', 
     elm.on 'shown', -> 
       elm.find( "[autofocus]" ).focus()
 
-    console.log "confirm popup"
-
+    null
+    
   definition = 
     require: 'ngModel'
     link: link
