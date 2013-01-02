@@ -10,7 +10,9 @@ Corespring Angular components (corespring-ng-components)
 
 (function() {
 
-  angular.module('cs.directives', []);
+  angular.module('cs.services', []);
+
+  angular.module('cs.directives', ['cs.services']);
 
   angular.module('cs', ['cs.directives']).value('cs.config', {});
 
@@ -154,6 +156,70 @@ Corespring Angular components (corespring-ng-components)
     };
     return definition;
   });
+
+  /*
+    Confirm popup. depends on angular-ui + bootstrap
+  
+    Usage: 
+      <div confirm-popup ng-model="selected">
+      <h2>remove?</h2>
+      <p>Are you sure?</p>
+      <button id="confirm">Yes</button>
+      <button id="cancel">No</button>
+    </div>
+  */
+
+
+  angular.module('cs.directives').directive('confirmPopup', [
+    '$timeout', 'Utils', function($timeout, Utils) {
+      var definition, link;
+      link = function(scope, elm, attrs, model) {
+        elm.addClass('modal hide');
+        elm.find("#confirm").click(function() {
+          elm.modal('hide');
+          if (scope[attrs.confirmed] != null) {
+            scope[attrs.confirmed]();
+          }
+          return null;
+        });
+        elm.find("#cancel").click(function() {
+          scope.$apply(function() {
+            Utils.applyValue(scope, attrs.ngModel, scope.stashedValue);
+            return null;
+          });
+          scope.stashedValue = null;
+          elm.modal('hide');
+          if (scope[attrs.cancelled] != null) {
+            scope[attrs.cancelled]();
+          }
+          return null;
+        });
+        scope.$watch(attrs.ngModel, function(newValue, oldValue) {
+          if (oldValue === true && newValue === false) {
+            scope.stashedValue = oldValue;
+            elm.modal({
+              show: true
+            });
+          }
+          if (!(newValue != null) && (oldValue != null)) {
+            scope.stashedValue = oldValue;
+            return elm.modal({
+              show: true
+            });
+          }
+        });
+        elm.on('shown', function() {
+          return elm.find("[autofocus]").focus();
+        });
+        return console.log("confirm popup");
+      };
+      definition = {
+        require: 'ngModel',
+        link: link
+      };
+      return definition;
+    }
+  ]);
 
   /*
   Taken from: 
@@ -537,6 +603,27 @@ Corespring Angular components (corespring-ng-components)
     }
   ]);
 
+  /*
+  Creates a dropdown with checkboxes so you can select multiple items.
+  params:
+    @multi-get-title - the function for rendering a title for an individual item
+    @multi-get-selected-title - a function that returns the html for the selection,
+      function( items -the selected items){ return -a html string } 
+    @multi-get-options - the data provider for the possible options
+    @multi-change - a callback when anything changes
+    @multi-uid - a property that uniquely indentifies the object within the array of options
+    @multi-model - the model to update with the selection
+  usage: 
+    <span multi-select
+                multi-get-selected-title="getCollectionSelectedTitle"
+                multi-options="collections"
+                multi-change="search"
+                multi-uid="name"
+                multi-model="searchParams.collection">
+              </span>
+  */
+
+
   angular.module('cs.directives').directive('multiSelect', function($timeout) {
     var compile, definition, link, template;
     template = "<span class=\"multi-select\">\n  <div \n    class=\"items\" \n    ng-click=\"showChooser=!showChooser\"\n    ng-bind-html-unsafe=\"multiGetSelectedTitle(selected)\">\n  </div>\n  <div class=\"chooser\" ng-show=\"showChooser\">\n   <ul>\n     <li ng-repeat=\"o in options\" >\n       <input type=\"checkbox\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\"></input>\n       {{multiGetTitle(o)}}\n     </li>\n   </ul>\n  </div>\n</span>";
@@ -788,6 +875,31 @@ Corespring Angular components (corespring-ng-components)
       return null;
     };
     return linkFn;
+  });
+
+  angular.module('cs.services').factory('Utils', function() {
+    var definition;
+    definition = {
+      /*
+          Apply a nested value..
+      */
+
+      applyValue: function(obj, property, value) {
+        var nextProp, props;
+        if (!(obj != null)) {
+          throw "Cannot apply to null object the property:  " + property + " with value: " + value;
+        }
+        if (property.indexOf(".") === -1) {
+          obj[property] = value;
+        } else {
+          props = property.split(".");
+          nextProp = props.shift();
+          this.applyValue(obj[nextProp], props.join("."), value);
+        }
+        return null;
+      }
+    };
+    return definition;
   });
 
 }).call(this);

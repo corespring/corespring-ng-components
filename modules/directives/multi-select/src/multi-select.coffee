@@ -1,8 +1,9 @@
 ###
 Creates a dropdown with checkboxes so you can select multiple items.
 params:
+  @multi-get-title - the function for rendering a title for an individual item
   @multi-get-selected-title - a function that returns the html for the selection,
-    function( items /*the selected items*/){ return /* a html string*/ } 
+    function( items -the selected items){ return -a html string } 
   @multi-get-options - the data provider for the possible options
   @multi-change - a callback when anything changes
   @multi-uid - a property that uniquely indentifies the object within the array of options
