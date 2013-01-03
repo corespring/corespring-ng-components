@@ -14,28 +14,14 @@ the editor this model will be updated.
 @param ace-mode - an ace mode - as above loads a mode.
 ###
 
-angular.module('cs.directives').directive('aceEditor', ($timeout) -> 
+angular.module('cs.directives').directive('aceEditor', ['$timeout', 'Utils', ($timeout, Utils) -> 
   definition = 
     replace: true
     template: "<div/>"
     link: (scope, element, attrs) -> 
 
-      ###
-      Apply a nested value..
-      ###
-      applyValue = (obj, property, value) ->
-        if !obj?
-          throw "Cannot apply to null object the property:  " + property + " with value: " + value 
+      applyValue = Utils.applyValue
 
-        if property.indexOf(".") == -1 
-          scope.$apply ->
-            obj[property] = value
-        else
-          props = property.split(".")
-          nextProp = props.shift()
-          applyValue(obj[nextProp], props.join("."), value )
-        null
-      
       ### 
       # Attach a listener for events that need to trigger a resize of the editor.
       # @param events
@@ -122,5 +108,5 @@ angular.module('cs.directives').directive('aceEditor', ($timeout) ->
 
 
   definition
-)
+])
 

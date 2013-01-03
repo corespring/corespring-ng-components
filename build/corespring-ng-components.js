@@ -44,129 +44,112 @@ the editor this model will be updated.
 
 (function() {
 
-  angular.module('cs.directives').directive('aceEditor', function($timeout) {
-    var definition;
-    definition = {
-      replace: true,
-      template: "<div/>",
-      link: function(scope, element, attrs) {
-        /*
-              Apply a nested value..
-        */
+  angular.module('cs.directives').directive('aceEditor', [
+    '$timeout', 'Utils', function($timeout, Utils) {
+      var definition;
+      definition = {
+        replace: true,
+        template: "<div/>",
+        link: function(scope, element, attrs) {
+          var applyValue, attachResizeEvents, initialData, onExceptionsChanged, theme;
+          applyValue = Utils.applyValue;
+          /* 
+          # Attach a listener for events that need to trigger a resize of the editor.
+          # @param events
+          */
 
-        var applyValue, attachResizeEvents, initialData, onExceptionsChanged, theme;
-        applyValue = function(obj, property, value) {
-          var nextProp, props;
-          if (!(obj != null)) {
-            throw "Cannot apply to null object the property:  " + property + " with value: " + value;
-          }
-          if (property.indexOf(".") === -1) {
-            scope.$apply(function() {
-              return obj[property] = value;
-            });
-          } else {
-            props = property.split(".");
-            nextProp = props.shift();
-            applyValue(obj[nextProp], props.join("."), value);
-          }
-          return null;
-        };
-        /* 
-        # Attach a listener for events that need to trigger a resize of the editor.
-        # @param events
-        */
-
-        attachResizeEvents = function(events) {
-          var event, eventsArray, _i, _len;
-          eventsArray = events.split(",");
-          for (_i = 0, _len = eventsArray.length; _i < _len; _i++) {
-            event = eventsArray[_i];
-            scope.$on(event, function() {
-              return $timeout(function() {
-                scope.editor.resize();
-                if (scope.aceModel != null) {
-                  return scope.editor.getSession().setValue(scope.$eval(scope.aceModel));
-                }
+          attachResizeEvents = function(events) {
+            var event, eventsArray, _i, _len;
+            eventsArray = events.split(",");
+            for (_i = 0, _len = eventsArray.length; _i < _len; _i++) {
+              event = eventsArray[_i];
+              scope.$on(event, function() {
+                return $timeout(function() {
+                  scope.editor.resize();
+                  if (scope.aceModel != null) {
+                    return scope.editor.getSession().setValue(scope.$eval(scope.aceModel));
+                  }
+                });
               });
-            });
-          }
-          return null;
-        };
-        onExceptionsChanged = function(newValue, oldValue) {
-          var exception, _i, _j, _len, _len1;
-          if (oldValue != null) {
-            for (_i = 0, _len = oldValue.length; _i < _len; _i++) {
-              exception = oldValue[_i];
-              scope.editor.renderer.removeGutterDecoration(exception.lineNumber - 1, "ace_failed");
             }
-          }
-          if (newValue != null) {
-            for (_j = 0, _len1 = newValue.length; _j < _len1; _j++) {
-              exception = newValue[_j];
-              scope.editor.renderer.addGutterDecoration(exception.lineNumber - 1, "ace_failed");
+            return null;
+          };
+          onExceptionsChanged = function(newValue, oldValue) {
+            var exception, _i, _j, _len, _len1;
+            if (oldValue != null) {
+              for (_i = 0, _len = oldValue.length; _i < _len; _i++) {
+                exception = oldValue[_i];
+                scope.editor.renderer.removeGutterDecoration(exception.lineNumber - 1, "ace_failed");
+              }
             }
+            if (newValue != null) {
+              for (_j = 0, _len1 = newValue.length; _j < _len1; _j++) {
+                exception = newValue[_j];
+                scope.editor.renderer.addGutterDecoration(exception.lineNumber - 1, "ace_failed");
+              }
+            }
+            return null;
+          };
+          if (attrs["aceResizeEvents"] != null) {
+            attachResizeEvents(attrs["aceResizeEvents"]);
           }
-          return null;
-        };
-        if (attrs["aceResizeEvents"] != null) {
-          attachResizeEvents(attrs["aceResizeEvents"]);
-        }
-        if (attrs["aceExceptions"] != null) {
-          scope.$watch(attrs["aceExceptions"], onExceptionsChanged);
-        }
-        scope.editor = ace.edit(element[0]);
-        scope.editor.getSession().setUseWrapMode(true);
-        theme = attrs["aceTheme"] || "eclipse";
-        scope.editor.setTheme("ace/theme/" + theme);
-        scope.$watch(attrs["aceMode"], function(newValue, oldValue) {
-          var AceMode, modeFactory;
-          if (!(newValue != null)) {
-            return;
+          if (attrs["aceExceptions"] != null) {
+            scope.$watch(attrs["aceExceptions"], onExceptionsChanged);
           }
-          if (!(scope.editor != null)) {
-            return;
-          }
-          if (newValue === "js") {
-            newValue = "javascript";
-          }
-          modeFactory = require("ace/mode/" + newValue);
-          if (!(modeFactory != null)) {
-            return;
-          }
-          AceMode = modeFactory.Mode;
-          scope.editor.getSession().setMode(new AceMode());
-          return null;
-        });
-        scope.aceModel = attrs["aceModel"];
-        scope.$watch(scope.aceModel, function(newValue, oldValue) {
-          if (scope.changeFromEditor) {
-            return;
-          }
-          $timeout(function() {
-            scope.suppressChange = true;
-            scope.editor.getSession().setValue(newValue);
-            scope.suppressChange = false;
+          scope.editor = ace.edit(element[0]);
+          scope.editor.getSession().setUseWrapMode(true);
+          theme = attrs["aceTheme"] || "eclipse";
+          scope.editor.setTheme("ace/theme/" + theme);
+          scope.$watch(attrs["aceMode"], function(newValue, oldValue) {
+            var AceMode, modeFactory;
+            if (!(newValue != null)) {
+              return;
+            }
+            if (!(scope.editor != null)) {
+              return;
+            }
+            if (newValue === "js") {
+              newValue = "javascript";
+            }
+            modeFactory = require("ace/mode/" + newValue);
+            if (!(modeFactory != null)) {
+              return;
+            }
+            AceMode = modeFactory.Mode;
+            scope.editor.getSession().setMode(new AceMode());
             return null;
           });
-          return null;
-        });
-        initialData = scope.$eval(scope.aceModel);
-        scope.editor.getSession().setValue(initialData);
-        return scope.editor.getSession().on("change", function() {
-          var newValue;
-          if (scope.suppressChange) {
-            return;
-          }
-          scope.changeFromEditor = true;
-          newValue = scope.editor.getSession().getValue();
-          applyValue(scope, scope.aceModel, newValue);
-          scope.changeFromEditor = false;
-          return null;
-        });
-      }
-    };
-    return definition;
-  });
+          scope.aceModel = attrs["aceModel"];
+          scope.$watch(scope.aceModel, function(newValue, oldValue) {
+            if (scope.changeFromEditor) {
+              return;
+            }
+            $timeout(function() {
+              scope.suppressChange = true;
+              scope.editor.getSession().setValue(newValue);
+              scope.suppressChange = false;
+              return null;
+            });
+            return null;
+          });
+          initialData = scope.$eval(scope.aceModel);
+          scope.editor.getSession().setValue(initialData);
+          return scope.editor.getSession().on("change", function() {
+            var newValue;
+            if (scope.suppressChange) {
+              return;
+            }
+            scope.changeFromEditor = true;
+            newValue = scope.editor.getSession().getValue();
+            applyValue(scope, scope.aceModel, newValue);
+            scope.changeFromEditor = false;
+            return null;
+          });
+        }
+      };
+      return definition;
+    }
+  ]);
 
 }).call(this);
 // Generated by CoffeeScript 1.3.3
@@ -936,7 +919,8 @@ Usage:
       */
 
       applyValue: function(obj, property, value) {
-        var nextProp, props;
+        var av, nextProp, props;
+        av = arguments.callee;
         if (!(obj != null)) {
           throw "Cannot apply to null object the property:  " + property + " with value: " + value;
         }
@@ -945,7 +929,7 @@ Usage:
         } else {
           props = property.split(".");
           nextProp = props.shift();
-          this.applyValue(obj[nextProp], props.join("."), value);
+          av(obj[nextProp], props.join("."), value);
         }
         return null;
       }
