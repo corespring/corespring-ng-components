@@ -17,14 +17,12 @@ usage:
               multi-model="searchParams.collection">
             </span>
 ###
+
+
 angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', ($timeout, Utils) -> 
 
   template = """<span class="multi-select">
-                   <div 
-                     class="items" 
-                     ng-click="showChooser=!showChooser"
-                     ng-bind-html-unsafe="multiGetSelectedTitle(selected)">
-                   </div>
+                  ${summaryHtml}
                    <div class="chooser" ng-show="showChooser">
                     <ul>
                       <li ng-repeat="o in options" >
@@ -36,6 +34,7 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
                  </span>"""
 
 
+
   ###
   Linking function
   ###
@@ -44,7 +43,6 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
     uidKey = (attrs['multiUid'] || "key")
     modelProp = attrs['multiModel']
     getTitleProp = attrs['multiGetTitle']
-    getSelectedTitleProp = attrs['multiGetSelectedTitle']
     changeCallback = attrs['multiChange']
     scope.noneSelected = "None selected"
     scope.showChooser = false
@@ -55,7 +53,11 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
       null
 
     scope.$watch modelProp, (newValue) ->
-      scope.selected = newValue if newValue?
+      if newValue?
+        scope.selected = newValue 
+      else
+        scope.selected = []
+        
       updateSelection() 
       null
 
@@ -103,9 +105,6 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
       scope[changeCallback]() if changeCallback?
       null
 
-    scope.multiGetSelectedTitle = (items) ->
-      scope[getSelectedTitleProp](items)
-
     scope.multiGetTitle = (t) -> 
       scope[getTitleProp](t)
     null
@@ -115,7 +114,18 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
   ###
   compile = (element,attrs,transclude) ->
     uidKey = (attrs['multiUid'] || "key")
-    prepped = template.replace("${uidKey}", uidKey)
+    outer = null
+    element.find(".summary").each ->
+      outer = $(@).clone().wrap('<p>').parent().html()
+    summaryHtml = outer
+
+    if !summaryHtml?
+      throw "You need to add a summary node to the multi-select: eg: <div id='summary'>...</div>"
+    summaryHtml = summaryHtml.replace /(<.*?)(>)/, "$1 ng-click='showChooser=!showChooser' $2"
+    prepped = template
+      .replace("${uidKey}", uidKey)
+      .replace("${summaryHtml}", summaryHtml)
+
     element.html(prepped)
     link 
   

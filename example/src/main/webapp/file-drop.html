@@ -1,0 +1,29 @@
+<html ng:app="fuExampleApp">
+<head>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+  <script type="text/javascript" src="js/corespring-ng-components.js"></script>
+  <script type="text/javascript" src="js/file-drop-example.js"></script>
+  <style>
+    .file-drop{
+      width: 100px;
+      height: 100px;
+      background-color: #00ff44;
+    }
+    .file-drop.over{
+      background-color: #00ffff;
+    }
+  </style>
+</head>
+<body ng:controller="MainController">
+
+  <div
+    class="file-drop"
+    file-drop
+    on-file-dropped="onLocalFileDropped"
+    file-types="json">
+       Drop your files here
+  </div>
+
+</body>
+</html>
