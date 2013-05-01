@@ -229,7 +229,7 @@ the editor this model will be updated.
     var definition;
     definition = {
       link: function($scope, $element, $attrs) {
-        var acceptedFileTypes, acceptedType, callback, dragFn, dragLeave, dragOver, drop, dropBody, dropbox, getClassNames, originalClasses;
+        var acceptedFileTypes, acceptedType, addListener, callback, dragFn, dragLeave, dragOver, drop, dropBody, dropbox, getClassNames, originalClasses;
         getClassNames = function(e) {
           return e.attr('class').split(/\s+/);
         };
@@ -277,9 +277,17 @@ the editor this model will be updated.
           return null;
         };
         drop = dragFn("", dropBody);
-        dropbox.addEventListener("dragleave", dragLeave, false);
-        dropbox.addEventListener("dragover", dragOver, false);
-        return dropbox.addEventListener("drop", drop, false);
+        addListener = function(target, msg, fn, weak) {
+          if (target['addEventListener']) {
+            target.addEventListener(msg, fn, weak);
+          } else if (target['attachEvent']) {
+            target.attachEvent(msg, fn, weak);
+          }
+          return null;
+        };
+        addListener(dropbox, "dragleave", dragLeave, false);
+        addListener(dropbox, "dragover", dragOver, false);
+        return addListener(dropbox, "drop", drop, false);
       }
     };
     return definition;

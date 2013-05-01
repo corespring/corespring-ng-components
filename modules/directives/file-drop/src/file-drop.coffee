@@ -45,10 +45,16 @@ angular.module('cs.directives').directive('fileDrop', ($rootScope) ->
 
       drop =  dragFn("", dropBody )
 
-      #dropbox.addEventListener("dragenter", dragEnter, false)
-      dropbox.addEventListener("dragleave", dragLeave, false)
-      dropbox.addEventListener("dragover", dragOver, false)
-      dropbox.addEventListener("drop", drop, false)
+      addListener = (target, msg, fn, weak) ->
+        if(target['addEventListener'])
+          target.addEventListener(msg,fn,weak)
+        else if(target['attachEvent'])
+          target.attachEvent(msg,fn,weak)
+        null
+
+      addListener(dropbox,"dragleave", dragLeave, false)
+      addListener(dropbox,"dragover", dragOver, false)
+      addListener(dropbox,"drop", drop, false)
 
   definition
 )
