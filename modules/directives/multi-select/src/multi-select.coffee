@@ -3,12 +3,12 @@ Creates a dropdown with checkboxes so you can select multiple items.
 params:
   @multi-get-title - the function for rendering a title for an individual item
   @multi-get-selected-title - a function that returns the html for the selection,
-    function( items -the selected items){ return -a html string } 
+    function( items -the selected items){ return -a html string }
   @multi-get-options - the data provider for the possible options
   @multi-change - a callback when anything changes
   @multi-uid - a property that uniquely indentifies the object within the array of options
   @multi-model - the model to update with the selection
-usage: 
+usage:
   <span multi-select
               multi-get-selected-title="getCollectionSelectedTitle"
               multi-options="collections"
@@ -16,20 +16,41 @@ usage:
               multi-uid="name"
               multi-model="searchParams.collection">
             </span>
+
+# BETA:::
+Providing your own repeater.
+
+A new option has been provided - the ability to add your own repeater.
+This allows you to format the options any way you want.
+
+To do this you need to add a node that has the class name "repeater".
+
+  Within this you'll be provided an 'options' variable which is the data provider you passed in.
+  The next thing you'll need to do is to specify a checkbox that has the following format:
+  <input type="checkbox" ng-model="selectedArr[c.${uidKey}]" ng-click="toggleItem(c)"></input>
+          {{c.name}}</div>
+
+          'selectedArr' - this is an internal array that keeps track of selections
+          'uidKey' - this is an internal variable of multi select - during compile phase it gets replaced
+          by whatever was passed in as 'multi-uid'. eg: c.${uidKey} -> c.id
+          'toggleItem' - an internal function that toggles the selection based on the uid. This will callback to your callback handler.
+
 ###
 
 
-angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', ($timeout, Utils) -> 
+angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', ($timeout, Utils) ->
 
-  template = """<span class="multi-select">
-                  ${summaryHtml}
-                   <div class="chooser" ng-show="showChooser">
-                    <ul>
+  defaultRepeater = """<ul>
                       <li ng-repeat="o in options" >
                         <input type="checkbox" ng-model="selectedArr[o.${uidKey}]" ng-click="toggleItem(o)"></input>
                         {{multiGetTitle(o)}}
                       </li>
-                    </ul>
+                    </ul>"""
+
+  template = """<span class="multi-select">
+                  ${summaryHtml}
+                   <div class="chooser" ng-show="showChooser">
+                    ${repeater}
                    </div>
                  </span>"""
 
@@ -48,27 +69,27 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
     scope.showChooser = false
 
     scope.$watch optionsProp, (newValue) ->
-      scope.options = newValue 
-      updateSelection() 
+      scope.options = newValue
+      updateSelection()
       null
 
     scope.$watch modelProp, (newValue) ->
       if newValue?
-        scope.selected = newValue 
+        scope.selected = newValue
       else
         scope.selected = []
-        
-      updateSelection() 
+
+      updateSelection()
       null
 
     updateSelection = ->
       if !scope.selected?
         return null
 
-      scope.selectedArr = {} 
+      scope.selectedArr = {}
       for x in scope.selected
-        if x[uidKey] 
-          scope.selectedArr[x[uidKey]] = true 
+        if x[uidKey]
+          scope.selectedArr[x[uidKey]] = true
 
       null
 
@@ -79,18 +100,18 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
     scope.toggleItem = (i) ->
 
       getIndexById = (arr, item) ->
-        for arrItem, index in arr 
+        for arrItem, index in arr
           if arrItem[uidKey] and arrItem[uidKey] == item[uidKey]
-            return index 
+            return index
         -1
 
       if !scope.$eval(modelProp)?
-        Utils.applyValue(scope, modelProp, []) 
-      
+        Utils.applyValue(scope, modelProp, [])
+
       arr = scope.$eval(modelProp)
       index = getIndexById(arr,i)
       optionIndex = scope.$eval(optionsProp).indexOf(i)
-      
+
       if index == -1
         arr.push(i)
       else
@@ -105,7 +126,7 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
       scope[changeCallback]() if changeCallback?
       null
 
-    scope.multiGetTitle = (t) -> 
+    scope.multiGetTitle = (t) ->
       scope[getTitleProp](t)
     null
 
@@ -119,17 +140,30 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
       outer = $(@).clone().wrap('<p>').parent().html()
     summaryHtml = outer
 
+
+    repeater = null
+    element.find(".repeater").each ->
+        repeater = $(@).clone().wrap('<p>').parent().html()
+
+
+    if !repeater?
+      repeater = defaultRepeater
+
     if !summaryHtml?
       throw "You need to add a summary node to the multi-select: eg: <div id='summary'>...</div>"
     summaryHtml = summaryHtml.replace /(<.*?)(>)/, "$1 ng-click='showChooser=!showChooser' $2"
     prepped = template
+      .replace("${repeater}", repeater)
       .replace("${uidKey}", uidKey)
       .replace("${summaryHtml}", summaryHtml)
 
+    console.log("prepped: ")
+    console.log(prepped)
+
     element.html(prepped)
-    link 
-  
-  definition = 
+    link
+
+  definition =
     restrict: 'A',
     compile: compile,
     scope: 'isolate',

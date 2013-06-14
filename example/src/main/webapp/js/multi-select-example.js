@@ -27,6 +27,22 @@ var MainController = function($scope){
 
   $scope.example = {};
 
+  $scope.example.orgs = [
+
+    { "name" : "Org One",
+        "collections" : [
+            {"name" : "Collection One", "id" : "11"},
+            {"name" : "Collection Two", "id" : "12"}
+        ]
+    },
+    { "name" : "Org Two",
+        "collections" : [
+            {"name" : "Collection One", "id" : "21"},
+            {"name" : "Collection Two", "id" : "22"}
+        ]
+    }
+  ];
+
   $scope.example.gradeLevels = [
         {
             "key":"PK",

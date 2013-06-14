@@ -30,7 +30,7 @@
 .multi-select > .chooser > ul {
   margin: 0px;
   padding:0px;
-} 
+}
 
 .multi-select > .chooser > ul > li {
   list-style: none;
@@ -57,24 +57,40 @@
 </style>
 </head>
 <body ng:controller="MainController">
-  <span multi-select 
+  <span multi-select
     multi-get-title="getTitle"
     multi-get-selected-title="getSelectedTitle"
-    multi-options="example.gradeLevels" 
+    multi-options="example.gradeLevels"
     multi-model="s.selected">
-    <div id="summary">
+    <div class="summary">
       <div>no of items</div>
       <div>{{getSelectedTitle(selected)}}</div>
     </div>
   </span>
-<!--
-  <span multi-select 
+  <h2> hello there</h2>
+
+  <div style="position:absolute; top: 30px; left: 500px;">
+
+   <span multi-select
     multi-get-title="getTitle"
     multi-get-selected-title="getSelectedTitle"
-    multi-options="example.gradeLevels" 
-    multi-model="s.selected2">
+    multi-options="example.orgs"
+    multi-uid="id"
+    multi-model="s.selectedTwo">
+    <div class="summary">
+      <div>no of items</div>
+      <div>{{getSelectedTitle(selected)}}</div>
+    </div>
+    <div class="repeater" style="width: 140px;">
+       <div ng-repeat="o in options">
+         <b>{{o.name}}</b> <br/>
+         <div ng-repeat="c in o.collections">
+          <input type="checkbox" ng-model="selectedArr[c.${uidKey}]" ng-click="toggleItem(c)"></input>
+          {{c.name}}</div>
+        </div>
+       </p>
+    </div>
   </span>
--->
-  <h2> hello there</h2>
+  </div>
 </body>
 </html>
