@@ -867,8 +867,6 @@ To do this you need to add a node that has the class name "repeater".
         }
         summaryHtml = summaryHtml.replace(/(<.*?)(>)/, "$1 ng-click='showChooser=!showChooser' $2");
         prepped = template.replace("${repeater}", repeater).replace("${uidKey}", uidKey).replace("${summaryHtml}", summaryHtml);
-        console.log("prepped: ");
-        console.log(prepped);
         element.html(prepped);
         return link;
       };
