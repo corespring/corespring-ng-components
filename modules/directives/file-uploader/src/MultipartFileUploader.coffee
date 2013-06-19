@@ -44,7 +44,7 @@ class @com.ee.XHRWrapper
 
     @request.onload = =>
       if @options.onUploadComplete?
-        @options.onUploadComplete @request.responseText
+        @options.onUploadComplete @request.responseText, @request.status
 
   setRequestHeader: (name, value) ->
     @request.setRequestHeader name, value
