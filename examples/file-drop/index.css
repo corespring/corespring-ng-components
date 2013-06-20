@@ -1,0 +1,9 @@
+.file-drop{
+  width: 100px;
+  height: 100px;
+  background-color: #00ff44;
+}
+.file-drop.over{
+  background-color: #00ffff;
+}
+

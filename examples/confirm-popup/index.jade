@@ -1,0 +1,23 @@
+extends ../base
+
+block content
+  div(ng-controller="MainController")
+    div(confirm-popup, ng-model="selected")
+      h2 remove?
+      p Are you sure?
+      button(id="confirm") Yes
+      button(id="cancel") No
+
+    div(confirm-popup, ng-model="nested.selected", confirmed="onConfirmed", cancelled="onCancelled")
+      h2 remove?
+      p Are you sure?
+      button(id="confirm") Yes
+      button(id="cancel") No
+
+    input(type="checkbox", ng-model="selected") Selected
+    input(type="checkbox", ng-model="nested.selected") Selected
+
+block scripts
+  script(type="text/javascript", src="/components/bootstrap/js/bootstrap.js")
+
+

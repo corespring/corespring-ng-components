@@ -1,0 +1,13 @@
+{
+  "name": "corespring-ng-components-example",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular": "latest",
+    "angular-resource": "latest",
+    "underscore": "latest",
+    "jquery": "latest",
+    "angular-ui": "latest",
+    "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
+    "ace-builds": "~1.1.01"
+  }
+}

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+npm install
+echo "run grunt"
+grunt
+echo "install example dependencies"
+cd examples
+bower install
+cd ..
+echo "done, now run - node app.js"

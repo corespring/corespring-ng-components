@@ -73,6 +73,7 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
       updateSelection()
       null
 
+
     scope.$watch modelProp, (newValue) ->
       if newValue?
         scope.selected = newValue
@@ -81,6 +82,7 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
 
       updateSelection()
       null
+
 
     updateSelection = ->
       if !scope.selected?
@@ -156,9 +158,6 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
       .replace("${repeater}", repeater)
       .replace("${uidKey}", uidKey)
       .replace("${summaryHtml}", summaryHtml)
-
-    console.log("prepped: ")
-    console.log(prepped)
 
     element.html(prepped)
     link
