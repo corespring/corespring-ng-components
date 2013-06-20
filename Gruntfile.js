@@ -16,7 +16,7 @@ module.exports = function (grunt) {
         join: true
       },
       files: {
-        'build/<%= pkg.name %>.js': 'modules/**/src/*.coffee'
+        'build/<%= pkg.name %>.js': ['common/src/module.coffee', 'modules/**/src/*.coffee']
       }
     },
   }

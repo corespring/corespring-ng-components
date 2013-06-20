@@ -1,0 +1,7 @@
+extends ../base
+
+block content
+  div(ng-controller="MainController")
+    .file-drop(file-drop, on-file-dropped="onLocalFileDropped", file-types="json")
+      | Drop your files here
+

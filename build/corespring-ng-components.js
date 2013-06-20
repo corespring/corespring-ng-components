@@ -1,21 +1,27 @@
-/*
-aceEditor directive usage:
-<div ace-editor
- ace-model="myText"
- ace-resize-trigger="some"
- ace-theme="sometheme"
- ace-mode="mode"></div>
-dependencies:
-ace.js + whatever theme and mode you wish to use
-@param ace-model - a ng model that contains the text to display in the editor. When the code is changed in
-the editor this model will be updated.
-@param ace-resize-events - a comma delimited list of ng events that that should trigger a resize
-@param ace-theme - an ace theme - loads them using "ace/theme/" + the them you specify. (you need to include the js for it)
-@param ace-mode - an ace mode - as above loads a mode.
-*/
-
-
 (function() {
+  angular.module('cs.services', []);
+
+  angular.module('cs.directives', ['cs.services']);
+
+  angular.module('cs', ['cs.directives']).value('cs.config', {});
+
+  /*
+  aceEditor directive usage:
+  <div ace-editor
+   ace-model="myText"
+   ace-resize-trigger="some"
+   ace-theme="sometheme"
+   ace-mode="mode"></div>
+  dependencies:
+  ace.js + whatever theme and mode you wish to use
+  @param ace-model - a ng model that contains the text to display in the editor. When the code is changed in
+  the editor this model will be updated.
+  @param ace-resize-events - a comma delimited list of ng events that that should trigger a resize
+  @param ace-theme - an ace theme - loads them using "ace/theme/" + the them you specify. (you need to include the js for it)
+  @param ace-mode - an ace mode - as above loads a mode.
+  */
+
+
   angular.module('cs.directives').directive('aceEditor', [
     '$timeout', 'Utils', function($timeout, Utils) {
       var definition;

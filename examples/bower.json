@@ -8,6 +8,6 @@
     "jquery": "latest",
     "angular-ui": "latest",
     "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
-    "ace": "latest"
+    "ace-builds": "~1.1.01"
   }
 }

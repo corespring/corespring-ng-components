@@ -1,0 +1,14 @@
+extends base
+
+block content
+  .hero-unit
+    h1 Corespring Ng Components
+    p= description
+      | &nbsp;-&nbsp;#{version}
+
+  .well
+    h5 The examples
+    ul
+      each example in examples
+        li
+          a(href="#{prefix}/#{example}") #{example}
