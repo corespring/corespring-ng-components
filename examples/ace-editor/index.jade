@@ -1,0 +1,17 @@
+extends ../base
+
+block content
+  div(ng-controller="MainController")
+    div(ace-editor,
+    style="float:left; width: 400px; height: 400px",
+    ace-mode="xml",
+    ace-theme="eclipse",
+    ace-model="codeText")
+
+    div(style="position: absolute; left: 450px; float:left; width: 300px; height: 300px",
+     ng-bind-html-unsafe="codeText")
+
+block scripts
+  script( type="text/javascript", src="/components/ace-builds/src-noconflict/ace.js")
+  script( type="text/javascript", src="/components/ace-builds/src-noconflict/mode-xml.js")
+  script( type="text/javascript", src="/components/ace-builds/src-noconflict/theme-eclipse.js")

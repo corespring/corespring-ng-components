@@ -1,0 +1,18 @@
+.tag-list-link{
+  padding: 3px;
+  float: left;
+  text-decoration: none;
+}
+
+a.tag-list-link.selected{
+  font-weight: bold;
+}
+
+.header{
+  padding: 3px;
+  float: left;
+}
+
+.tag-list-link a{
+  text-decoration: none;
+}

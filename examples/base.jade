@@ -1,0 +1,17 @@
+doctype 5
+html(ng-app=(path ? "exampleApp" : ""))
+  head
+    title= title
+    link(rel="stylesheet", href="/components/bootstrap/css/bootstrap.css")
+    - if(path)
+      link(rel="stylesheet", href="css/#{path}.css")
+    block head
+  body
+    block content
+
+    script(type="text/javascript", src="/components/jquery/jquery.min.js")
+    script(type="text/javascript", src="/components/angular/angular.min.js")
+    script(type="text/javascript", src="/corespring-ng-components.js")
+    - if(path)
+      script(type="text/javascript", src="js/#{path}.js")
+    block scripts

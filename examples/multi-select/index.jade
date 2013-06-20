@@ -1,0 +1,37 @@
+extends ../base
+
+block content
+  h1 multi-select!!
+
+  div(ng-controller="MainController")
+    div(ng-controller="MainController")
+      span(multi-select,
+        multi-get-title="getTitle",
+        multi-get-selected-title="getSelectedTitle",
+        multi-options="example.gradeLevels",
+        multi-model="s.selected")
+        .summary
+          div
+            | No of items
+          div
+            | {{getSelectedTitle(selected)}}
+
+
+    div(style="position:absolute; top: 30px; left: 500px;")
+     span(
+      multi-select,
+      multi-get-title="getTitle",
+      multi-get-selected-title="getSelectedTitle",
+      multi-options="example.orgs",
+      multi-uid="id",
+      multi-model="s.selectedTwo")
+        .summary
+          div no of items
+          div {{getSelectedTitle(selected)}}
+        .repeater(style="width: 140px;")
+          div(ng-repeat="o in options")
+            b {{o.name}}
+            div(ng-repeat="c in o.collections")
+              input(type="checkbox", ng-model="selectedArr[c.${uidKey}]", ng-click="toggleItem(c)")
+                | {{c.name}}
+

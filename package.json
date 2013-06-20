@@ -1,0 +1,38 @@
+{
+  "author": "CoreSpring",
+  "name": "corespring-ng-components",
+  "version": "0.0.1",
+  "description": "some angular components by corespring",
+  "homepage": "http://github.com/corespring/corespring-ng-components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/corespring/corespring-ng-components.git"
+  },
+  "dependencies": {
+    "express": "*",
+    "jade": "*",
+    "connect-assets": "*",
+    "less": "*",
+    "coffee-script": "*",
+    "underscore": "*",
+    "nconf": "*",
+    "corespring": "https://github.com/corespring/corespring-js/tarball/master",
+    "bower": "*",
+    "grunt": "*",
+    "grunt-cli": "*",
+    "grunt-contrib-clean": "~0.4.1"
+  },
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "scripts": {},
+  "devDependencies": {
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-jasmine": "latest",
+    "grunt-shell": "~0.2.2",
+    "grunt-contrib-jshint": "~0.5.4",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-version": "~0.2.2"
+  }
+}

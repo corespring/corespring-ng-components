@@ -1,0 +1,33 @@
+extends ../base
+
+block content
+  div(ng-controller="MainController")
+    div
+      span.header(style="float:left") Knowledge
+      span(tag-list,
+        tags="availableTags",
+        selected-tags="selectedTags")
+
+    div(style="float:none; clear:both;")
+
+    div
+      span.header(style="float:left") Understand
+      span(tag-list,
+        tags="understand.tags",
+        selected-tags="understand.selectedTags")
+
+    div(style="float:none; clear:both;")
+
+    hr/
+    h5 Knowledge
+    div(style='display:block')
+      span(ng-repeat="s in selectedTags")
+        | {{s}}
+        br/
+
+    hr/
+    h5 Understand
+    div(style='display:block')
+      span(ng-repeat="s in understand.selectedTags")
+        | {{s}}
+        br/

@@ -1,0 +1,47 @@
+ .multi-select{
+    position: relative;
+}
+
+.multi-select > .items {
+  cursor: pointer;
+}
+
+.multi-select > .chooser {
+  position: absolute;
+  background: #ffe9ff;
+  padding: 10px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+  box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+}
+
+.multi-select > .chooser > ul {
+  margin: 0px;
+  padding:0px;
+}
+
+.multi-select > .chooser > ul > li {
+  list-style: none;
+  margin: 0px;
+}
+
+.tag-list-link{
+  padding: 3px;
+  float: left;
+  text-decoration: none;
+}
+
+a.tag-list-link.selected{
+  font-weight: bold;
+}
+.header{
+  padding: 3px;
+  float: left;
+}
+
+.tag-list-link a{
+  text-decoration: none;
+}

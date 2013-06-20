@@ -1,0 +1,11 @@
+extends ../base
+
+block content
+  h3 TODO: Add backend server for this
+  div(ng-controller="MainController")
+    a(file-uploader, fu-url="/example/UploadImage", fu-name="my-file") add file
+    img(ng-src="{{imageUrl}}")
+
+    br/
+    a(file-uploader, fu-url="/example/UploadImage", fu-mode="raw", fu-name="my-file") add file
+    img(ng-src="{{imageUrl}}")
