@@ -3,13 +3,11 @@ corespring-ng-components
 
 re-usable angular-js components
 
-# Running the Example app
+# Installation
 
-    npm install
-    cd examples
-    bower install
-    cd ..
-    node app.js
+    ./install
+
+This will install the node dependencies + bower dependencies for the example app.
 
 # Developing
 
