@@ -1,4 +1,8 @@
 (function() {
+  var version;
+
+  version = '0.0.1';
+
   angular.module('cs.services', []);
 
   angular.module('cs.directives', ['cs.services']);
