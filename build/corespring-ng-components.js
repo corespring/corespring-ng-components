@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.1';
+  version = '0.0.2';
 
   angular.module('cs.services', []);
 
@@ -197,6 +197,55 @@
       return definition;
     }
   ]);
+
+  angular.module('cs.directives').directive('contentEditable', function() {
+    var ENTER_KEY, definition;
+    ENTER_KEY = 13;
+    definition = {
+      restrict: 'A',
+      require: 'ngModel',
+      scope: {
+        ngModel: '=',
+        validate: '&'
+      },
+      link: function($scope, $element, $attrs) {
+        var isValid;
+        $element.attr('contenteditable', '');
+        $scope.$watch('ngModel', function(newValue) {
+          $element.html($scope.ngModel);
+          return null;
+        });
+        isValid = function(text) {
+          if ($scope.validate && $attrs.validate) {
+            return $scope.validate({
+              text: text,
+              id: $attrs.contentId
+            });
+          } else {
+            return true;
+          }
+        };
+        $element.bind('keydown', function(event) {
+          var change;
+          if (event.which === ENTER_KEY) {
+            change = $element.html();
+            $scope.$apply(function() {
+              if (isValid(change)) {
+                return $scope.ngModel = change;
+              }
+            });
+            $element.blur();
+          }
+          return null;
+        });
+        return $element.bind('blur', function() {
+          $element.html($scope.ngModel);
+          return null;
+        });
+      }
+    };
+    return definition;
+  });
 
   angular.module('cs.directives').directive('fileDrop', function($rootScope) {
     var definition;

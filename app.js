@@ -40,7 +40,11 @@ var handleAsset = function(suffix, req, res, next){
 }
 
 app.get('/corespring-ng-components.js', function(req,res,next){
+  console.log("return corespring-ng-components");
   res.sendfile('./build/corespring-ng-components.js');
+  res.header("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.header("Pragma", "no-cache");
+  res.header("Expires", 0);
 });
 
 app.get('/examples/js/:path', function(req,res,next){

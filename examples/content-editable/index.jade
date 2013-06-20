@@ -1,0 +1,18 @@
+extends ../base
+
+block content
+  div(ng-controller="MainController")
+    div( content-editable, ng-model="someText", content-id="thingy", validate="validateChange(text,id)")
+      | Here is some text
+
+    input(ng-model="someText")
+    div(style="background-color: rgba(0,0,0,0.1)", ng-bind="someText")
+
+    hr/
+    div( content-editable, ng-model="someTextTwo")
+      | Here is some text two
+
+    input(ng-model="someTextTwo")
+    div(style="background-color: rgba(0,0,0,0.1)", ng-bind="someTextTwo")
+
+
