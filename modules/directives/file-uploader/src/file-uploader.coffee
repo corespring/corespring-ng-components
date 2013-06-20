@@ -14,7 +14,7 @@ Usage:
 
 Events:
   "uploadStarted"  (event) ->  : fired when uploading has started
-  "uploadCompleted" (event, serverResponse)-> : fired when uploading is completed
+  "uploadCompleted" (event, serverResponse, serverStatus)-> : fired when uploading is completed
 
 Dependencies: JQuery
 
@@ -84,9 +84,9 @@ angular.module('cs.directives').directive('fileUploader', ($rootScope) ->
         options = 
           onLoadStart : =>
             $rootScope.$broadcast "uploadStarted"
-          onUploadComplete : (responseText) =>
-            scope[attrs["fuUploadCompleted"]](responseText) if scope[attrs["fuUploadCompleted"]]?
-            $rootScope.$broadcast "uploadCompleted", responseText
+          onUploadComplete : (responseText, status) =>
+            scope[attrs["fuUploadCompleted"]](responseText, status) if scope[attrs["fuUploadCompleted"]]?
+            $rootScope.$broadcast "uploadCompleted", responseText, status
 
         if mode == "raw"
           uploader = new com.ee.RawFileUploader file, event.target.result, url, name, options
