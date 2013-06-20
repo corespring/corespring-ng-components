@@ -206,34 +206,38 @@
       require: 'ngModel',
       scope: {
         ngModel: '=',
-        validate: '&'
+        contentId: '@',
+        validateChange: '&'
       },
       link: function($scope, $element, $attrs) {
-        var isValid;
+        var processChange;
         $element.attr('contenteditable', '');
         $scope.$watch('ngModel', function(newValue) {
           $element.html($scope.ngModel);
           return null;
         });
-        isValid = function(text) {
-          if ($scope.validate && $attrs.validate) {
-            return $scope.validate({
+        $scope.onValidationResult = function(success) {
+          if (success) {
+            $scope.ngModel = $element.html();
+          }
+          return null;
+        };
+        processChange = function(text) {
+          if ($scope.validateChange && $attrs.validateChange) {
+            return $scope.validateChange({
               text: text,
-              id: $attrs.contentId
+              id: $scope.contentId,
+              callback: $scope.onValidationResult
             });
           } else {
-            return true;
+            return $scope.onValidationResult(true);
           }
         };
         $element.bind('keydown', function(event) {
           var change;
           if (event.which === ENTER_KEY) {
             change = $element.html();
-            $scope.$apply(function() {
-              if (isValid(change)) {
-                return $scope.ngModel = change;
-              }
-            });
+            processChange(change);
             $element.blur();
           }
           return null;

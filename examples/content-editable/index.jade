@@ -2,7 +2,12 @@ extends ../base
 
 block content
   div(ng-controller="MainController")
-    div( content-editable, ng-model="someText", content-id="thingy", validate="validateChange(text,id)")
+    h5 This element won't allow 'banana' to be entered
+    div(
+      content-editable,
+      ng-model="someText",
+      content-id="{{idOne}}",
+      validate-change="validateChange(text,id,callback)")
       | Here is some text
 
     input(ng-model="someText")

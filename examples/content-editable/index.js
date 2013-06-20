@@ -6,8 +6,11 @@ var MainController = function($scope){
   $scope.someText = "What's going on?";
   $scope.someTextTwo = "Let's get it on";
 
-  $scope.validateChange = function(name, id){
+  $scope.idOne = "_id_one";
+
+  $scope.validateChange = function(name, id, callback){
     console.log("validate change: " + name + ", id: " + id);
-    return name.indexOf("banana") == -1;
+    var containsBanana = name.indexOf("banana") != -1;
+    callback(!containsBanana);
   }
 }
