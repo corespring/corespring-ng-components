@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.2';
+  version = 'X.X.X';
 
   angular.module('cs.services', []);
 
@@ -372,7 +372,7 @@
       }
       this.request.onload = function() {
         if (_this.options.onUploadComplete != null) {
-          return _this.options.onUploadComplete(_this.request.responseText);
+          return _this.options.onUploadComplete(_this.request.responseText, _this.request.status);
         }
       };
     }
@@ -574,7 +574,7 @@
   
   Events:
     "uploadStarted"  (event) ->  : fired when uploading has started
-    "uploadCompleted" (event, serverResponse)-> : fired when uploading is completed
+    "uploadCompleted" (event, serverResponse, serverStatus)-> : fired when uploading is completed
   
   Dependencies: JQuery
   
@@ -649,11 +649,11 @@
             onLoadStart: function() {
               return $rootScope.$broadcast("uploadStarted");
             },
-            onUploadComplete: function(responseText) {
+            onUploadComplete: function(responseText, status) {
               if (scope[attrs["fuUploadCompleted"]] != null) {
-                scope[attrs["fuUploadCompleted"]](responseText);
+                scope[attrs["fuUploadCompleted"]](responseText, status);
               }
-              return $rootScope.$broadcast("uploadCompleted", responseText);
+              return $rootScope.$broadcast("uploadCompleted", responseText, status);
             }
           };
           if (mode === "raw") {
@@ -670,6 +670,154 @@
       }
     };
     return definition;
+  });
+
+  angular.module('cs.services').factory('Canvas', function() {
+    var Canvas;
+    Canvas = (function() {
+      function Canvas(board) {
+        this.board = board;
+        this.points = [];
+      }
+
+      Canvas.prototype.getMouseCoords = function(e) {
+        return new JXG.Coords(JXG.COORDS_BY_SCREEN, [e.offsetX, e.offsetY], this.board);
+      };
+
+      Canvas.prototype.pointCollision = function(coords) {
+        var el, _i, _len, _ref;
+        _ref = this.board.objects;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          el = _ref[_i];
+          if (JXG.isPoint(this.board.objects[el]) && this.board.objects[el].hasPoint(coords.scrCoords[1], coords.scrCoords[2])) {
+            return el;
+          } else {
+            return null;
+          }
+        }
+      };
+
+      Canvas.prototype.addPoint = function(coords) {
+        var point;
+        point = this.board.create('point', [coords.usrCoords[1], coords.usrCoords[2]]);
+        this.points.push(point);
+        return point;
+      };
+
+      Canvas.prototype.popPoint = function() {
+        return this.board.removeObject(this.points.pop);
+      };
+
+      Canvas.prototype.removePoint = function(pointId) {
+        var p, _i, _len, _ref, _results;
+        this.board.removeObject(pointId);
+        _ref = this.points;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          p = _ref[_i];
+          if (p.id !== pointId) {
+            _results.push(this.points = p);
+          }
+        }
+        return _results;
+      };
+
+      Canvas.prototype.on = function(event, handler) {
+        return this.board.on(event, handler);
+      };
+
+      Canvas.prototype.makeLine = function() {
+        if (this.points.length === 2) {
+          return this.board.create('line', [this.points[0], this.points[1]], {
+            strokeColor: '#00ff00',
+            strokeWidth: 2,
+            fixed: true
+          });
+        }
+      };
+
+      Canvas.prototype.prettifyPoints = function() {
+        var p, _i, _len, _ref, _results;
+        _ref = this.points;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          p = _ref[_i];
+          _results.push({
+            name: p.name,
+            x: p.coords.usrCoords[1],
+            y: p.coords.usrCoords[2]
+          });
+        }
+        return _results;
+      };
+
+      Canvas.prototype.interpolatePoint = function(p, scale) {
+        var interpolate;
+        interpolate = function(num) {
+          return Math.round(num / scale) * scale;
+        };
+        return p.moveTo([interpolate(p.X()), interpolate(p.Y())]);
+      };
+
+      return Canvas;
+
+    })();
+    return Canvas;
+  });
+
+  angular.module('cs.directives').directive('jsxGraph', function(Canvas) {
+    return {
+      template: "<div id='box' class='jxgbox' style='width:200px; height:200px;'></div>",
+      restrict: 'A',
+      scope: {
+        boardParams: '=',
+        pointsCallback: '=',
+        maxPoints: '@',
+        mousePtr: '=',
+        scale: '@'
+      },
+      link: function(scope, elem, attr) {
+        var canvas, domain, range;
+        domain = scope.boardParams.domain;
+        range = scope.boardParams.range;
+        if (domain && range) {
+          canvas = new Canvas(JXG.JSXGraph.initBoard('box', {
+            boundingbox: [0 - domain, range, domain, 0 - range],
+            grid: true,
+            axis: true,
+            showNavigation: false,
+            showCopyright: false
+          }));
+          canvas.on('up', function(e) {
+            var coords, line, point, pointCollision;
+            coords = canvas.getMouseCoords(e);
+            pointCollision = canvas.pointCollision(coords);
+            if ((pointCollision == null) && (canvas.points.length < scope.maxPoints)) {
+              point = canvas.addPoint(coords);
+              point.on("up", function() {
+                canvas.interpolatePoint(point, scope.scale);
+                scope.pointsCallback(canvas.prettifyPoints());
+              });
+              canvas.interpolatePoint(point, scope.scale);
+              scope.pointsCallback(canvas.prettifyPoints());
+              if (canvas.points.length === 2) {
+                line = canvas.makeLine();
+              }
+            }
+          });
+          return canvas.on("move", function(e) {
+            var coords;
+            coords = canvas.getMouseCoords(e);
+            scope.mousePtr = {
+              x: coords.usrCoords[1],
+              y: coords.usrCoords[2]
+            };
+          });
+        } else {
+          return console.error("domain and/or range unspecified");
+        }
+      }
+    };
   });
 
   /*
