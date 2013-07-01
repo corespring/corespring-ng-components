@@ -3,9 +3,9 @@ angular.module('cs.directives').directive 'jsxGraph', (Canvas) ->
   restrict: 'A',
   scope: 
     boardParams: '=',
-    pointsCallback: '=',
+    pointsOut: '=',
+    points: '=',
     maxPoints: '@',
-    mousePtr: '=',
     scale: '@'
   link: (scope,elem,attr) ->
     domain = scope.boardParams.domain
@@ -24,17 +24,12 @@ angular.module('cs.directives').directive 'jsxGraph', (Canvas) ->
           point = canvas.addPoint coords
           point.on "up", () ->
             canvas.interpolatePoint point, scope.scale
-            scope.pointsCallback canvas.prettifyPoints()
+            scope.points = canvas.prettifyPoints()
             return
           canvas.interpolatePoint point, scope.scale
-          scope.pointsCallback canvas.prettifyPoints()
+          scope.points = canvas.prettifyPoints()
           line = canvas.makeLine() if canvas.points.length == 2
-        return
-      canvas.on "move", (e) ->
-        coords = canvas.getMouseCoords e
-        scope.mousePtr = 
-          x: coords.usrCoords[1],
-          y: coords.usrCoords[2]
         return
     else
       console.error "domain and/or range unspecified"
+    return

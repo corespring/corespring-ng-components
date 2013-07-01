@@ -19,12 +19,10 @@ block content
         p y: 
         input(type="text", style="width: 80px;", ng-model="points.B.y")
       div(class="span5")
-        p {{"x: "+mouseCoords.x+" y: "+mouseCoords.y}}
         div(jsx-graph, 
         board-params="boardParams", 
-        points-callback="updatePoints", 
-        max-points="2", 
-        mouse-ptr="mouseCoords", 
+        points="points", 
+        max-points="2",
         scale="1")
     div(class="row")
       p {{equation}}

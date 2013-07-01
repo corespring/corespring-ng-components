@@ -737,18 +737,17 @@
       };
 
       Canvas.prototype.prettifyPoints = function() {
-        var p, _i, _len, _ref, _results;
+        var newPoints, p, _i, _len, _ref;
+        newPoints = {};
         _ref = this.points;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           p = _ref[_i];
-          _results.push({
-            name: p.name,
+          newPoints[p.name] = {
             x: p.coords.usrCoords[1],
             y: p.coords.usrCoords[2]
-          });
+          };
         }
-        return _results;
+        return newPoints;
       };
 
       Canvas.prototype.interpolatePoint = function(p, scale) {
@@ -771,9 +770,9 @@
       restrict: 'A',
       scope: {
         boardParams: '=',
-        pointsCallback: '=',
+        pointsOut: '=',
+        points: '=',
         maxPoints: '@',
-        mousePtr: '=',
         scale: '@'
       },
       link: function(scope, elem, attr) {
@@ -796,25 +795,17 @@
               point = canvas.addPoint(coords);
               point.on("up", function() {
                 canvas.interpolatePoint(point, scope.scale);
-                scope.pointsCallback(canvas.prettifyPoints());
+                scope.points = canvas.prettifyPoints();
               });
               canvas.interpolatePoint(point, scope.scale);
-              scope.pointsCallback(canvas.prettifyPoints());
+              scope.points = canvas.prettifyPoints();
               if (canvas.points.length === 2) {
                 line = canvas.makeLine();
               }
             }
           });
-          return canvas.on("move", function(e) {
-            var coords;
-            coords = canvas.getMouseCoords(e);
-            scope.mousePtr = {
-              x: coords.usrCoords[1],
-              y: coords.usrCoords[2]
-            };
-          });
         } else {
-          return console.error("domain and/or range unspecified");
+          console.error("domain and/or range unspecified");
         }
       }
     };

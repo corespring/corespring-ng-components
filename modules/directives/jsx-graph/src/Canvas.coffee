@@ -37,7 +37,10 @@ angular.module('cs.services').factory 'Canvas', () ->
       @board.create('line', [@points[0], @points[1]], {strokeColor:'#00ff00', strokeWidth:2, fixed:true}) if @points.length == 2
 
     prettifyPoints: () ->
-      {name: p.name, x: p.coords.usrCoords[1], y: p.coords.usrCoords[2]} for p in @points
+      newPoints = {}
+      for p in @points
+        newPoints[p.name] = {x: p.coords.usrCoords[1], y: p.coords.usrCoords[2]} 
+      newPoints
 
     interpolatePoint: (p, scale) ->
       interpolate = (num) ->
