@@ -4,21 +4,24 @@ angular.module('cs.services').factory 'Canvas', () ->
       @points = []
 
     #given mouse clicke event e, get the coordinates on the board that was clicked
-    getMouseCoords: (e) ->
-      new JXG.Coords JXG.COORDS_BY_SCREEN, [e.offsetX, e.offsetY], @board
+    getMouseCoords: (e,scale) ->
+      coords = new JXG.Coords JXG.COORDS_BY_SCREEN, [e.offsetX, e.offsetY], @board
+      coords = x:coords.usrCoords[1], y: coords.usrCoords[2]
+      if scale? then this.interpolateCoords(coords,scale) else coords 
+
 	
     #if there is a collision, return the point that coords collides with
     #otherwise return undefined
     pointCollision: (coords) ->
       for el in @board.objects
-        if JXG.isPoint(@board.objects[el]) and @board.objects[el].hasPoint coords.scrCoords[1], coords.scrCoords[2]
+        if JXG.isPoint(@board.objects[el]) and @board.objects[el].hasPoint coords.x, coords.y
           return el
         else
           return null
 	
     #add a point to the board, update the points array
     addPoint: (coords) ->
-      point = @board.create 'point', [coords.usrCoords[1], coords.usrCoords[2]]
+      point = @board.create 'point', [coords.x, coords.y]
       @points.push point
       point
     
@@ -42,8 +45,9 @@ angular.module('cs.services').factory 'Canvas', () ->
         newPoints[p.name] = {x: p.coords.usrCoords[1], y: p.coords.usrCoords[2]} 
       newPoints
 
-    interpolatePoint: (p, scale) ->
+    interpolateCoords: (coords, scale) ->
       interpolate = (num) ->
         Math.round(num/scale) * scale
-      p.moveTo [interpolate(p.X()), interpolate(p.Y())]
+      x: interpolate(coords.x), y: interpolate(coords.y)
+
   Canvas

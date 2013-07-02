@@ -3,8 +3,8 @@ angular.module('cs.directives').directive 'jsxGraph', (Canvas) ->
   restrict: 'A',
   scope: 
     boardParams: '=',
-    pointsOut: '=',
     points: '=',
+    setPoints: '=',
     maxPoints: '@',
     scale: '@'
   link: (scope,elem,attr) ->
@@ -17,19 +17,52 @@ angular.module('cs.directives').directive 'jsxGraph', (Canvas) ->
             axis: true,
             showNavigation: false,
             showCopyright: false
-      canvas.on 'up', (e) ->
-        coords = canvas.getMouseCoords e
-        pointCollision = canvas.pointCollision coords
-        if !pointCollision? and (canvas.points.length < scope.maxPoints)
-          point = canvas.addPoint coords
-          point.on "up", () ->
-            canvas.interpolatePoint point, scope.scale
-            scope.points = canvas.prettifyPoints()
-            return
-          canvas.interpolatePoint point, scope.scale
-          scope.points = canvas.prettifyPoints()
-          line = canvas.makeLine() if canvas.points.length == 2
+
+      onPointMove = (point, coords) ->
+        newCoords = if coords? 
+          canvas.interpolateCoords {x: coords.x, y: coords.y}, scope.scale 
+        else 
+          canvas.interpolateCoords {x: point.X(), y: point.Y()}, scope.scale
+        point.moveTo [newCoords.x, newCoords.y]
+        scope.points[point.name] = newCoords
         return
+
+      addPoint = (coords) ->
+        point = canvas.addPoint coords
+        point.on "up", () ->
+          onPointMove point
+          return
+        onPointMove point
+        line = canvas.makeLine() if canvas.points.length == 2  
+        point
+
+      canvas.on 'up', (e) ->
+        coords = canvas.getMouseCoords e, scope.scale
+        if (canvas.points.length < scope.maxPoints)
+          addPoint coords
+        return
+
+      #watch for points change and change points on graph accordingly
+      #note: when the points on the graph are moved with the cursor, this is called. resulting in redundant work. it's not
+      #to bad though
+      scope.$watch 'points', (newValue, oldValue) ->
+        if newValue isnt oldValue
+          for ptName, pts of scope.points
+            coordx = parseFloat pts.x
+            coordy = parseFloat pts.y
+            if !isNaN(coordx) && !isNaN(coordy)
+              coords = {x: coordx, y: coordy}
+              canvasPointRef = null;
+              for canvasPoint in canvas.points
+                if ptName == canvasPoint.name
+                  canvasPointRef = canvasPoint
+              if canvasPointRef?
+                if canvasPointRef.X() isnt coords.x or canvasPointRef.Y() isnt coords.y
+                  onPointMove canvasPointRef, coords
+              else if (canvas.points.length < scope.maxPoints)
+                  addPoint coords
+        return
+      ,true
     else
       console.error "domain and/or range unspecified"
     return
