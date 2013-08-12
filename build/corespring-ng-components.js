@@ -199,8 +199,9 @@
   ]);
 
   angular.module('cs.directives').directive('contentEditable', function() {
-    var ENTER_KEY, definition;
+    var ENTER_KEY, TAB_KEY, definition;
     ENTER_KEY = 13;
+    TAB_KEY = 9;
     definition = {
       restrict: 'A',
       require: 'ngModel',
@@ -235,7 +236,7 @@
         };
         $element.bind('keydown', function(event) {
           var change;
-          if (event.which === ENTER_KEY) {
+          if (event.which === ENTER_KEY || event.which === TAB_KEY) {
             change = $element.html();
             processChange(change);
             $element.blur();
@@ -372,7 +373,7 @@
       }
       this.request.onload = function() {
         if (_this.options.onUploadComplete != null) {
-          return _this.options.onUploadComplete(_this.request.responseText);
+          return _this.options.onUploadComplete(_this.request.responseText, _this.request.status);
         }
       };
     }
@@ -574,7 +575,7 @@
   
   Events:
     "uploadStarted"  (event) ->  : fired when uploading has started
-    "uploadCompleted" (event, serverResponse)-> : fired when uploading is completed
+    "uploadCompleted" (event, serverResponse, serverStatus)-> : fired when uploading is completed
   
   Dependencies: JQuery
   
@@ -649,11 +650,11 @@
             onLoadStart: function() {
               return $rootScope.$broadcast("uploadStarted");
             },
-            onUploadComplete: function(responseText) {
+            onUploadComplete: function(responseText, status) {
               if (scope[attrs["fuUploadCompleted"]] != null) {
-                scope[attrs["fuUploadCompleted"]](responseText);
+                scope[attrs["fuUploadCompleted"]](responseText, status);
               }
-              return $rootScope.$broadcast("uploadCompleted", responseText);
+              return $rootScope.$broadcast("uploadCompleted", responseText, status);
             }
           };
           if (mode === "raw") {

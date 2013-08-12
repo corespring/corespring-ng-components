@@ -11,6 +11,7 @@
 angular.module('cs.directives')
 .directive('contentEditable', ->
   ENTER_KEY = 13
+  TAB_KEY = 9
 
   definition =
     restrict: 'A',
@@ -44,7 +45,7 @@ angular.module('cs.directives')
           $scope.onValidationResult(true)
 
       $element.bind 'keydown', (event) ->
-        if event.which == ENTER_KEY
+        if event.which == ENTER_KEY or event.which == TAB_KEY
           change = $element.html()
 
           processChange(change)
