@@ -20,6 +20,7 @@ angular.module('cs.directives')
     scope:
       ngModel:'=',
       contentId: '@',
+      eventType: '@',
       validateChange:'&'
 
 
@@ -44,10 +45,17 @@ angular.module('cs.directives')
         else
           $scope.onValidationResult(true)
 
-      $element.bind 'keydown', (event) ->
-        if event.which == ENTER_KEY or event.which == TAB_KEY
-          change = $element.html()
+      allowUpdate = (key) ->
+        if $scope.eventType == "ALL"
+          true
+        else if $scope.eventType == "TAB" and key == TAB_KEY
+          true
+        else if key == ENTER_KEY
+          true
 
+      $element.bind 'keydown', (event) ->
+        if allowUpdate(event.which)
+          change = $element.html()
           processChange(change)
           $element.blur()
         null

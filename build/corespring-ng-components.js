@@ -208,10 +208,11 @@
       scope: {
         ngModel: '=',
         contentId: '@',
+        eventType: '@',
         validateChange: '&'
       },
       link: function($scope, $element, $attrs) {
-        var processChange;
+        var allowUpdate, processChange;
         $element.attr('contenteditable', '');
         $scope.$watch('ngModel', function(newValue) {
           $element.html($scope.ngModel);
@@ -234,9 +235,18 @@
             return $scope.onValidationResult(true);
           }
         };
+        allowUpdate = function(key) {
+          if ($scope.eventType === "ALL") {
+            return true;
+          } else if ($scope.eventType === "TAB" && key === TAB_KEY) {
+            return true;
+          } else if (key === ENTER_KEY) {
+            return true;
+          }
+        };
         $element.bind('keydown', function(event) {
           var change;
-          if (event.which === ENTER_KEY || event.which === TAB_KEY) {
+          if (allowUpdate(event.which)) {
             change = $element.html();
             processChange(change);
             $element.blur();
