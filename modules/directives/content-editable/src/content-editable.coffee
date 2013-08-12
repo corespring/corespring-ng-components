@@ -53,7 +53,7 @@ angular.module('cs.directives')
         else if key == ENTER_KEY
           true
 
-      $element.bind 'keydown', (event) ->
+      $element.bind 'keyup', (event) ->
         if allowUpdate(event.which)
           change = $element.html()
           processChange(change)

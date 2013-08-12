@@ -244,7 +244,7 @@
             return true;
           }
         };
-        $element.bind('keydown', function(event) {
+        $element.bind('keyup', function(event) {
           var change;
           if (allowUpdate(event.which)) {
             change = $element.html();
