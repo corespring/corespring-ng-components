@@ -17,6 +17,8 @@ angular.module('cs.directives').directive('tagList', ($timeout) ->
       linkClass = (attrs.tagListLinkClass || "tag-list-link")
 
       buildTagList = ->
+
+        $(element).html("<span></span>")
         for x in availableTags 
           $link = $("""<a class='#{linkClass}' href='javascript:void(0)'>#{x}</a>""")
           $(element).append( $link )
