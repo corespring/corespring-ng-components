@@ -21,12 +21,15 @@ angular.module('cs.directives')
       ngModel:'=',
       contentId: '@',
       eventType: '@',
+      removeFocusAfterEdit: '@',
       validateChange:'&'
 
 
     link: ($scope, $element, $attrs) ->
 
+      console.log "removeFocusAfterEdit: #{$scope.removeFocusAfterEdit}"
       $element.attr('contenteditable', '')
+
 
       $scope.$watch 'ngModel', (newValue) ->
         $element.html($scope.ngModel)
@@ -53,11 +56,16 @@ angular.module('cs.directives')
         else if key == ENTER_KEY
           true
 
-      $element.bind 'keyup', (event) ->
+      removeFocusAfterEdit = -> $scope.removeFocusAfterEdit != "false"
+
+      eventType = if $scope.eventType == "ALL" then "keyup" else "keydown"
+
+      $element.bind eventType, (event) ->
         if allowUpdate(event.which)
+          console.log "update allowed...."
           change = $element.html()
           processChange(change)
-          $element.blur()
+          $element.blur() if removeFocusAfterEdit()
         null
 
       $element.bind 'blur', ->

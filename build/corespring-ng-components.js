@@ -209,10 +209,12 @@
         ngModel: '=',
         contentId: '@',
         eventType: '@',
+        removeFocusAfterEdit: '@',
         validateChange: '&'
       },
       link: function($scope, $element, $attrs) {
-        var allowUpdate, processChange;
+        var allowUpdate, eventType, processChange, removeFocusAfterEdit;
+        console.log("removeFocusAfterEdit: " + $scope.removeFocusAfterEdit);
         $element.attr('contenteditable', '');
         $scope.$watch('ngModel', function(newValue) {
           $element.html($scope.ngModel);
@@ -244,12 +246,19 @@
             return true;
           }
         };
-        $element.bind('keyup', function(event) {
+        removeFocusAfterEdit = function() {
+          return $scope.removeFocusAfterEdit !== "false";
+        };
+        eventType = $scope.eventType === "ALL" ? "keyup" : "keydown";
+        $element.bind(eventType, function(event) {
           var change;
           if (allowUpdate(event.which)) {
+            console.log("update allowed....");
             change = $element.html();
             processChange(change);
-            $element.blur();
+            if (removeFocusAfterEdit()) {
+              $element.blur();
+            }
           }
           return null;
         });

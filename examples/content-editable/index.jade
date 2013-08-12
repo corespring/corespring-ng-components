@@ -21,3 +21,11 @@ block content
     div(style="background-color: rgba(0,0,0,0.1)", ng-bind="someTextTwo")
 
 
+    hr/
+    div( content-editable, event-type="ALL", remove-focus-after-edit="false", ng-model="someTextTwo")
+      | Here is some text two
+
+    input(ng-model="someTextTwo")
+    div(style="background-color: rgba(0,0,0,0.1)", ng-bind="someTextTwo")
+
+

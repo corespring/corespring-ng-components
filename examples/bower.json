@@ -7,8 +7,8 @@
     "underscore": "latest",
     "jquery": "latest",
     "angular-ui": "latest",
-    "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
-    "ace-builds": "~1.1.01",
+    "bootstrap": "latest",
+    "ace-builds": "1.1.1",
     "jsx-graph": "git@github.com:bleezmo/jsxgraph.git"
   }
 }
