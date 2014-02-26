@@ -18,7 +18,7 @@ app.set('views', __dirname + '/examples');
 app.set('view engine', 'jade');
 
 //Bootstrap gets a special mapping
-app.use('/components', express.static(__dirname + '/examples/components'));
+app.use('/components', express.static(__dirname + '/examples/bower_components'));
 app.use(express.bodyParser());
 
 app.get('/examples/:path', function(req,res, next){

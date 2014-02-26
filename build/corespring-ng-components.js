@@ -133,6 +133,37 @@
     }
   ]);
 
+  angular.module('cs.directives').directive('buttonBar', [
+    '$log', function($log) {
+      var link, out;
+      link = function($scope, $element, $attr) {
+        $scope.selected = function(b) {
+          return $scope.ngModel && $scope.ngModel.indexOf(b) !== -1;
+        };
+        return $scope.toggle = function(b) {
+          var index;
+          $scope.ngModel = $scope.ngModel || [];
+          index = $scope.ngModel.indexOf(b);
+          if (index === -1) {
+            return $scope.ngModel.push(b);
+          } else {
+            return $scope.ngModel.splice(index, 1);
+          }
+        };
+      };
+      out = {
+        restrict: 'E',
+        link: link,
+        scope: {
+          buttonProvider: '=',
+          ngModel: '='
+        },
+        template: "<div class=\"btn-group\">\n  <button \n    ng-repeat=\"b in buttonProvider\" \n    type=\"button\" \n    ng-click=\"toggle(b)\"\n    onmouseout=\"this.blur()\"\n    ng-class=\"{ active: selected(b)}\"\n    class=\"btn btn-default\">{{b}}</button>\n</div>"
+      };
+      return out;
+    }
+  ]);
+
   /*
     Confirm popup. depends on angular-ui + bootstrap
   

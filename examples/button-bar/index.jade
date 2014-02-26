@@ -1,0 +1,12 @@
+extends ../base
+
+block content
+  div(ng-controller="MainController")
+    button-bar(
+      ng-model="selectedButtons", 
+      button-provider="availableButtons")
+    br/
+    | {{selectedButtons}}
+    br/
+    | {{availableButtons}}
+
