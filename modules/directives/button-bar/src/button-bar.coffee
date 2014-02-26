@@ -20,7 +20,7 @@ angular.module('cs.directives')
         buttonProvider: '='
         ngModel: '='
       template: """
-      <div class="btn-group">
+      <div class="btn-group btn-group-xs">
         <button 
           ng-repeat="b in buttonProvider" 
           type="button" 
