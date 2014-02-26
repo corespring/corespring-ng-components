@@ -9,4 +9,12 @@ block content
     | {{selectedButtons}}
     br/
     | {{availableButtons}}
+    br/
+    button-bar(
+      ng-model="two.selected", 
+      button-provider="two.available")
+    br/
+    | {{two.selected}}
+    br/
+    | {{two.available}}
 

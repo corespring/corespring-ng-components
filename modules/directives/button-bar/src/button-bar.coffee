@@ -1,3 +1,7 @@
+#
+# @ngModel = the chosen items
+# @buttonProvider an array of choices
+#
 angular.module('cs.directives')
   .directive('buttonBar', [ '$log', ($log) ->
 
@@ -20,7 +24,7 @@ angular.module('cs.directives')
         buttonProvider: '='
         ngModel: '='
       template: """
-      <div class="btn-group btn-group-xs">
+      <div class="btn-group btn-group-sm">
         <button 
           ng-repeat="b in buttonProvider" 
           type="button" 

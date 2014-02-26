@@ -158,7 +158,7 @@
           buttonProvider: '=',
           ngModel: '='
         },
-        template: "<div class=\"btn-group btn-group-xs\">\n  <button \n    ng-repeat=\"b in buttonProvider\" \n    type=\"button\" \n    ng-click=\"toggle(b)\"\n    onmouseout=\"this.blur()\"\n    ng-class=\"{ active: selected(b)}\"\n    class=\"btn btn-default\">{{b}}</button>\n</div>"
+        template: "<div class=\"btn-group btn-group-sm\">\n  <button \n    ng-repeat=\"b in buttonProvider\" \n    type=\"button\" \n    ng-click=\"toggle(b)\"\n    onmouseout=\"this.blur()\"\n    ng-class=\"{ active: selected(b)}\"\n    class=\"btn btn-default\">{{b}}</button>\n</div>"
       };
       return out;
     }

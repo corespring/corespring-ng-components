@@ -9,4 +9,11 @@ var MainController = function($scope){
   $scope.availableButtons = [
     "One", "Two", "Three"
   ];
+
+
+  $scope.two = {
+
+    selected: [ "1", "2"], 
+    available: ["1", "2", "3"]
+  };
 };
