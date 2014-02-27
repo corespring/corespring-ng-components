@@ -1,3 +1,6 @@
 *sublime*
 cp_files.sh
 node_modules
+*.iml
+.idea
+
