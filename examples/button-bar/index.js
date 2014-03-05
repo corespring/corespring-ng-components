@@ -6,14 +6,23 @@ var MainController = function($scope){
 
   $scope.selectedButtons = [];
 
-  $scope.availableButtons = [
+  $scope.one = {
+    available: [
     "One", "Two", "Three"
-  ];
+  ],
+  selected: []
+  };
 
 
   $scope.two = {
 
     selected: [ "1", "2"], 
     available: ["1", "2", "3"]
+  };
+
+  $scope.three = {
+    selected: ["key-1"],
+    available: [ 
+    {key : 'key-1', value: "v-1"}]
   };
 };

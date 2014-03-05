@@ -2,14 +2,18 @@ extends ../base
 
 block content
   div(ng-controller="MainController")
+
+    h1 basic
     button-bar(
-      ng-model="selectedButtons", 
-      button-provider="availableButtons")
+      ng-model="one.selected", 
+      button-provider="one.available")
     br/
-    | {{selectedButtons}}
+    | {{one.selected}}
     br/
-    | {{availableButtons}}
+    | {{one.available}}
     br/
+
+    h2 preselected
     button-bar(
       ng-model="two.selected", 
       button-provider="two.available")
@@ -18,3 +22,12 @@ block content
     br/
     | {{two.available}}
 
+    h2 with key 
+    button-bar(
+      ng-model="three.selected", 
+      button-provider="three.available", 
+      key="key")
+    br/
+    | {{three.selected}}
+    br/
+    | {{three.available}}

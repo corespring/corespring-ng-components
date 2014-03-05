@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.2';
+  version = 'X.X.X';
 
   angular.module('cs.services', []);
 
@@ -138,27 +138,39 @@
       var link, out;
       link = function($scope, $element, $attr) {
         $scope.selected = function(b) {
-          return $scope.ngModel && $scope.ngModel.indexOf(b) !== -1;
+          var dataValue;
+          dataValue = $scope.getValue(b);
+          return $scope.ngModel && $scope.ngModel.indexOf(dataValue) !== -1;
         };
-        return $scope.toggle = function(b) {
-          var index;
+        $scope.toggle = function(b) {
+          var dataValue, index;
           $scope.ngModel = $scope.ngModel || [];
-          index = $scope.ngModel.indexOf(b);
+          dataValue = $scope.getValue(b);
+          index = $scope.ngModel.indexOf(dataValue);
           if (index === -1) {
-            return $scope.ngModel.push(b);
+            return $scope.ngModel.push(dataValue);
           } else {
             return $scope.ngModel.splice(index, 1);
+          }
+        };
+        return $scope.getValue = function(b) {
+          if ($scope.key != null) {
+            return b[$scope.key];
+          } else {
+            return b;
           }
         };
       };
       out = {
         restrict: 'E',
         link: link,
+        replace: true,
         scope: {
           buttonProvider: '=',
-          ngModel: '='
+          ngModel: '=',
+          key: '@'
         },
-        template: "<div class=\"btn-group btn-group-sm\">\n  <button \n    ng-repeat=\"b in buttonProvider\" \n    type=\"button\" \n    ng-click=\"toggle(b)\"\n    onmouseout=\"this.blur()\"\n    ng-class=\"{ active: selected(b)}\"\n    class=\"btn btn-default\">{{b}}</button>\n</div>"
+        template: "<div class=\"btn-group btn-group-justified\">\n  <div class=\"btn-group\"\n      ng-repeat=\"b in buttonProvider\" \n      >\n    <button \n      type=\"button\" \n      ng-click=\"toggle(b)\"\n      onmouseout=\"this.blur()\"\n      ng-class=\"{ active: selected(b)}\"\n      class=\"btn btn-default\">{{getValue(b)}}</button>\n    </div>\n</div>"
       };
       return out;
     }
