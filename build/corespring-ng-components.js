@@ -1,7 +1,11 @@
 (function() {
   var version;
 
+<<<<<<< HEAD
   version = 'X.X.X';
+=======
+  version = '0.0.3';
+>>>>>>> 9c83442fccf0280aa4c8b957345b5a1dfde7564f
 
   angular.module('cs.services', []);
 
