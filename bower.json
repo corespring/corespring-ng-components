@@ -1,6 +1,6 @@
 {
   "name": "corespring-ng-components-example",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "dependencies": {
     "angular": "~1.2.14",
     "angular-resource": "latest",
@@ -8,8 +8,7 @@
     "jquery": "~1.10.2",
     "angular-ui": "latest",
     "bootstrap": "~3.0.1",
-    "ace-builds": "1.1.1",
-    "jsx-graph": "https://github.com/corespring/jsxgraph.git"
+    "ace-builds": "1.1.1"
   },
   "resolutions": {
     "angular": "~1.2.14"
