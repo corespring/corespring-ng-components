@@ -713,8 +713,14 @@
               return $rootScope.$broadcast("uploadStarted");
             },
             onUploadComplete: function(responseText, status) {
-              if (scope[attrs["fuUploadCompleted"]] != null) {
-                scope[attrs["fuUploadCompleted"]](responseText, status);
+              var fnExpr;
+              fnExpr = attrs["fuUploadCompleted"];
+              if (fnExpr) {
+                if (fnExpr.indexOf('(') >= 0) {
+                  scope.$eval(fnExpr);
+                } else if (scope[fnExpr] != null) {
+                  scope[fnExpr](responseText, status);
+                }
               }
               return $rootScope.$broadcast("uploadCompleted", responseText, status);
             }
