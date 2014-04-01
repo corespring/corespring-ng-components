@@ -85,7 +85,13 @@ angular.module('cs.directives').directive('fileUploader', ($rootScope) ->
           onLoadStart : =>
             $rootScope.$broadcast "uploadStarted"
           onUploadComplete : (responseText, status) =>
-            scope[attrs["fuUploadCompleted"]](responseText, status) if scope[attrs["fuUploadCompleted"]]?
+            fnExpr = attrs["fuUploadCompleted"]
+            if fnExpr
+              if fnExpr.indexOf('(') >= 0
+                scope.$eval(fnExpr)
+              else if scope[fnExpr]?
+                scope[fnExpr](responseText, status)
+
             $rootScope.$broadcast "uploadCompleted", responseText, status
 
         if mode == "raw"
