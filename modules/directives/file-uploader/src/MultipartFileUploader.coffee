@@ -28,29 +28,25 @@ class @com.ee.XHRWrapper
     @request = new XMLHttpRequest()
     @request.upload.index = 0
     @request.upload.file = @file
-    @request.upload.downloadStartTime = now;
-    @request.upload.currentStart = now;
-    @request.upload.currentProgress = 0;
-    @request.upload.startData = 0;
-    #@request.upload.addEventListener "progress", ((e) => @_progress e), false
+    @request.upload.downloadStartTime = now
+    @request.upload.currentStart = now
+    @request.upload.currentProgress = 0
+    @request.upload.startData = 0
+    @request.upload.addEventListener("progress", @options.onUpdateProgress, false) if @options.onUpdateProgress?
+    @request.upload.addEventListener("load", @options.onUploadComplete, false) if @options.onUploadComplete?
+    @request.upload.addEventListener("error", @options.onUploadFailed, false) if @options.onUploadFailed?
+    @request.upload.addEventListener("abort", @options.onUploadCanceled, false) if @options.onUploadCanceled?
     @request.open "POST", @url, true
-
-    #@request.setRequestHeader 'content-type', "multipart/form-data; boundary=#{boundary}"
     @request.setRequestHeader "Accept", "application/json"
-    #@request.sendAsBinary formBody
     
-    if @options.onLoadStart? 
-      @options.onLoadStart()
-
-    @request.onload = =>
-      if @options.onUploadComplete?
-        @options.onUploadComplete @request.responseText, @request.status
-
   setRequestHeader: (name, value) ->
     @request.setRequestHeader name, value
     null
 
   beginUpload: ->
+    if @options.onLoadStart? 
+      @options.onLoadStart()
+
     @request.sendAsBinary @formBody
     null
 
