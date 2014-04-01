@@ -412,7 +412,8 @@
 
   this.com.ee.XHRWrapper = (function() {
     function XHRWrapper(file, formBody, url, name, options) {
-      var now;
+      var now,
+        _this = this;
       this.file = file;
       this.formBody = formBody;
       this.url = url;
@@ -427,11 +428,8 @@
       this.request.upload.currentStart = now;
       this.request.upload.currentProgress = 0;
       this.request.upload.startData = 0;
-      if (this.options.onUpdateProgress != null) {
-        this.request.upload.addEventListener("progress", this.options.onUpdateProgress, false);
-      }
-      if (this.options.onUploadComplete != null) {
-        this.request.upload.addEventListener("load", this.options.onUploadComplete, false);
+      if (this.options.onUploadProgress != null) {
+        this.request.upload.addEventListener("progress", this.options.onUploadProgress, false);
       }
       if (this.options.onUploadFailed != null) {
         this.request.upload.addEventListener("error", this.options.onUploadFailed, false);
@@ -441,6 +439,17 @@
       }
       this.request.open("POST", this.url, true);
       this.request.setRequestHeader("Accept", "application/json");
+      this.request.onload = function() {
+        if (_this.request.status !== 200) {
+          if (_this.options.onUploadFailed != null) {
+            return _this.options.onUploadFailed(_this.request);
+          }
+        } else {
+          if (_this.options.onUploadComplete != null) {
+            return _this.options.onUploadComplete(_this.request.responseText, _this.request.status);
+          }
+        }
+      };
     }
 
     XHRWrapper.prototype.setRequestHeader = function(name, value) {

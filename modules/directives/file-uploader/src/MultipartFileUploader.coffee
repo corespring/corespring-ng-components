@@ -32,13 +32,20 @@ class @com.ee.XHRWrapper
     @request.upload.currentStart = now
     @request.upload.currentProgress = 0
     @request.upload.startData = 0
-    @request.upload.addEventListener("progress", @options.onUpdateProgress, false) if @options.onUpdateProgress?
-    @request.upload.addEventListener("load", @options.onUploadComplete, false) if @options.onUploadComplete?
+    @request.upload.addEventListener("progress", @options.onUploadProgress, false) if @options.onUploadProgress?
     @request.upload.addEventListener("error", @options.onUploadFailed, false) if @options.onUploadFailed?
     @request.upload.addEventListener("abort", @options.onUploadCanceled, false) if @options.onUploadCanceled?
     @request.open "POST", @url, true
     @request.setRequestHeader "Accept", "application/json"
     
+
+    @request.onload = =>
+      if @request.status != 200
+        @options.onUploadFailed(@request) if @options.onUploadFailed?
+      else 
+        if @options.onUploadComplete?
+          @options.onUploadComplete @request.responseText, @request.status
+
   setRequestHeader: (name, value) ->
     @request.setRequestHeader name, value
     null
