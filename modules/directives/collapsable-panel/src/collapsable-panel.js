@@ -44,7 +44,7 @@ angular.module('cs.directives')
   .directive('panelHeading',[function(){
     return {
       replace:true,
-      require:"^collapsiblePanel",
+      require:"^collapsablePanel",
       transclude:true,
       restrict: 'E',
       scope: {},
@@ -66,7 +66,7 @@ angular.module('cs.directives')
   }])
   .directive('panelContent',[function(){
     return {
-      require:"^collapsiblePanel",
+      require:"^collapsablePanel",
       replace:true,
       transclude:true,
       restrict: 'E',
