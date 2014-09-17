@@ -4,6 +4,7 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     clean: {
       js: ['build'],
+      coffee: ['build/coffee-modules.js'],
       all: ['build', 'examples/components']
     },
 
@@ -33,13 +34,22 @@ module.exports = function (grunt) {
         }
       }
     },
+    concat: {
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: ['build/coffee-modules.js', 'modules/**/src/*.js'],
+          dest: 'build/<%= pkg.name %>.js',
+      }
+    },
     coffee: {
      compileJoined: {
       options: {
         join: true
       },
       files: {
-        'build/<%= pkg.name %>.js': ['common/src/module.coffee', 'modules/**/src/*.coffee']
+        'build/coffee-modules.js': ['common/src/module.coffee', 'modules/**/src/*.coffee']
       }
     },
   }
@@ -48,12 +58,13 @@ module.exports = function (grunt) {
 grunt.initConfig(config);
 grunt.loadNpmTasks('grunt-contrib-watch');
 grunt.loadNpmTasks('grunt-contrib-coffee');
+grunt.loadNpmTasks('grunt-contrib-concat');
 grunt.loadNpmTasks('grunt-contrib-clean');
 grunt.loadNpmTasks('grunt-contrib-uglify');
 grunt.loadNpmTasks('grunt-contrib-jasmine');
 grunt.loadNpmTasks('grunt-contrib-jshint');
 grunt.loadNpmTasks('grunt-version');
 grunt.loadNpmTasks('grunt-shell');
-grunt.registerTask('default', ['clean:js', 'coffee', 'uglify:my_target', 'version']);
+grunt.registerTask('default', ['clean:js', 'coffee', 'concat', 'clean:coffee', 'uglify:my_target', 'version']);
 
 };
