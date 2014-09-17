@@ -1,7 +1,6 @@
 angular.module('cs.directives')
   .directive('collapsablePanel', [
-    function () {
-
+    function() {
       'use strict';
 
       return {
@@ -9,33 +8,30 @@ angular.module('cs.directives')
         restrict: 'E',
         template: '<div class="panel" ></div>',
         controller: function($scope, $element, $attrs) {
+          var collapseVar;
 
-          this.toggle = function(){
+          this.toggle = function() {
             $scope[collapseVar] = !$scope[collapseVar];
           }
 
-          var collapseVar;
-
-          function isCollapsed(el){
+          function isCollapsed(el) {
             return !el.hasClass('in');
           }
 
-          if ($attrs.collapsed){
+          if ($attrs.collapsed) {
             collapseVar = $attrs.collapsed;
 
-            $scope.$watch(collapseVar,function(newVal){
-
+            $scope.$watch(collapseVar,function(newVal) {
               var content = $element.find('.collapse');
-              if (isCollapsed(content) != newVal){
+              if (isCollapsed(content) != newVal) {
                 content.collapse(newVal ? 'hide':'show');
               }
-            })
+            });
           }
         },
-        link:function(scope,$element,attrs,ctrl,$transclude){
+        link: function(scope,$element,attrs,ctrl,$transclude){
           $transclude(scope, function(clone){
             $element.find('.panel').append(clone);
-            //$element.append(clone);
           })
         }
       };
@@ -43,9 +39,9 @@ angular.module('cs.directives')
   ])
   .directive('panelHeading',[function(){
     return {
-      replace:true,
-      require:"^collapsablePanel",
-      transclude:true,
+      replace: true,
+      require: "^collapsablePanel",
+      transclude: true,
       restrict: 'E',
       scope: {},
       template: [
@@ -53,33 +49,33 @@ angular.module('cs.directives')
         '    <a href ng-click="onClick()" >',
         '    </a>',
         '</div>'].join('\n'),
-      link: function($scope, $element, $attrs, collapsiblePanel, $transclude){
+      link: function($scope, $element, $attrs, collapsablePanel, $transclude) {
         $scope.onClick = function(){
-          collapsiblePanel.toggle();
+          collapsablePanel.toggle();
         }
 
-        $transclude($scope.$parent, function(clone){
+        $transclude($scope.$parent, function(clone) {
           $element.find('a').append(clone);
-        })
+        });
       }
-    }
+    };
   }])
   .directive('panelContent',[function(){
     return {
-      require:"^collapsablePanel",
-      replace:true,
-      transclude:true,
+      require: "^collapsablePanel",
+      replace: true,
+      transclude: true,
       restrict: 'E',
       scope: {},
       template: [
-        '<div id="collapseOne" class="panel-collapse collapse in">',
+        '<div id="collapse-{{$id}}" class="panel-collapse collapse in">',
         '  <div class="panel-body">',
         '  </div>',
         '</div>'].join('\n'),
-      link:function(scope,$element,attrs,ctrl,$transclude){
-        $transclude(scope.$parent, function(clone){
+      link: function(scope,$element,attrs,ctrl,$transclude) {
+        $transclude(scope.$parent, function(clone) {
           $element.find('.panel-body').append(clone);
-        })
+        });
       }
-    }
+    };
   }]);
