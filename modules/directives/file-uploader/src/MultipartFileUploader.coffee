@@ -40,7 +40,7 @@ class @com.ee.XHRWrapper
     
 
     @request.onload = =>
-      if @request.status != 200
+      if [200..204].indexOf(@request.status) == -1
         @options.onUploadFailed(@request) if @options.onUploadFailed?
       else 
         if @options.onUploadComplete?

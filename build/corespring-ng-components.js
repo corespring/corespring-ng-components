@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.8';
+  version = '0.0.9';
 
   angular.module('cs.services', []);
 
@@ -440,7 +440,7 @@
       this.request.open("POST", this.url, true);
       this.request.setRequestHeader("Accept", "application/json");
       this.request.onload = function() {
-        if (_this.request.status !== 200) {
+        if ([200, 201, 202, 203, 204].indexOf(_this.request.status) === -1) {
           if (_this.options.onUploadFailed != null) {
             return _this.options.onUploadFailed(_this.request);
           }
