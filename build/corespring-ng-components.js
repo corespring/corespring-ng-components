@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.10';
+  version = '0.0.11';
 
   angular.module('cs.services', []);
 
