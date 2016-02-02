@@ -23,7 +23,6 @@ Simplifies the xhr upload api
 class @com.ee.XHRWrapper
 
   constructor: (@file, @formBody, @url, @name, @options) ->
-    formBody = @binaryData
     now = new Date().getTime()
     @request = new XMLHttpRequest()
     @request.upload.index = 0
@@ -37,7 +36,7 @@ class @com.ee.XHRWrapper
     @request.upload.addEventListener("abort", @options.onUploadCanceled, false) if @options.onUploadCanceled?
     @request.open "POST", @url, true
     @request.setRequestHeader "Accept", "application/json"
-    
+    @request.setRequestHeader "Content-Type", "application/octet-stream"
 
     @request.onload = =>
       if [200..204].indexOf(@request.status) == -1
