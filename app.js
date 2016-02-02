@@ -3,6 +3,7 @@ var fs = require('fs'),
   http = require('http'),
   packageInfo = require('./package'),
   _ = require('underscore'),
+  bodyParser = require('body-parser'),
   express = require('express');
 
 var app = express();
@@ -19,12 +20,13 @@ app.set('view engine', 'jade');
 
 //Bootstrap gets a special mapping
 app.use('/components', express.static(__dirname + '/examples/bower_components'));
-app.use(express.bodyParser());
+app.use(bodyParser());
 
 app.get('/examples/:path', function(req,res, next){
 
   var handleTemplate = function(err, html){
     if(err) {
+      console.log(err);
       res.status(404).contentType('text/plain').send('Cannot GET /examples/' + req.params.path);
     } else {
       res.end(html);

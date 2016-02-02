@@ -2,7 +2,7 @@
   "name": "corespring-ng-components-example",
   "version": "0.0.9",
   "dependencies": {
-    "angular": "~1.2.14",
+    "angular": "1.2.14",
     "angular-resource": "latest",
     "lodash": "latest",
     "jquery": "~1.10.2",

@@ -9,18 +9,19 @@
     "url": "https://github.com/corespring/corespring-ng-components.git"
   },
   "dependencies": {
-    "express": "*",
-    "jade": "*",
-    "connect-assets": "*",
-    "less": "*",
-    "coffee-script": "*",
-    "underscore": "*",
-    "nconf": "*",
-    "corespring": "https://github.com/corespring/corespring-js/tarball/master",
+    "body-parser": "^1.14.2",
     "bower": "*",
+    "coffee-script": "*",
+    "connect-assets": "*",
+    "corespring": "git+ssh://git@github.com/corespring/corespring-js#master",
+    "express": "~4.13.3",
     "grunt": "*",
     "grunt-cli": "*",
-    "grunt-contrib-clean": "~0.4.1"
+    "grunt-contrib-clean": "~0.4.1",
+    "jade": "*",
+    "less": "*",
+    "nconf": "*",
+    "underscore": "*"
   },
   "engines": {
     "node": ">= 0.6.0"

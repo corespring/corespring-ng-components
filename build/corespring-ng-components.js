@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.9';
+  version = '0.0.10';
 
   angular.module('cs.services', []);
 
@@ -419,7 +419,6 @@
       this.url = url;
       this.name = name;
       this.options = options;
-      formBody = this.binaryData;
       now = new Date().getTime();
       this.request = new XMLHttpRequest();
       this.request.upload.index = 0;
@@ -439,6 +438,7 @@
       }
       this.request.open("POST", this.url, true);
       this.request.setRequestHeader("Accept", "application/json");
+      this.request.setRequestHeader("Content-Type", "application/octet-stream");
       this.request.onload = function() {
         if ([200, 201, 202, 203, 204].indexOf(_this.request.status) === -1) {
           if (_this.options.onUploadFailed != null) {
