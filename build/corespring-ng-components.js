@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.11';
+  version = '0.0.12';
 
   angular.module('cs.services', []);
 
@@ -823,7 +823,7 @@
   angular.module('cs.directives').directive('multiSelect', [
     '$timeout', 'Utils', function($timeout, Utils) {
       var compile, defaultRepeater, definition, link, template;
-      defaultRepeater = "<ul>\n  <li ng-repeat=\"o in options\" >\n    <input type=\"checkbox\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\"></input>\n    {{multiGetTitle(o)}}\n  </li>\n</ul>";
+      defaultRepeater = "<ul>\n  <li ng-repeat=\"o in options\" >\n    <label>\n    <input type=\"checkbox\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\"></input>\n    {{multiGetTitle(o)}}\n    </label>\n  </li>\n</ul>";
       template = "<span class=\"multi-select\">\n ${summaryHtml}\n  <div class=\"chooser\" ng-show=\"showChooser\">\n   ${repeater}\n  </div>\n</span>";
       /*
       Linking function
