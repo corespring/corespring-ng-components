@@ -3,9 +3,17 @@
 }
 
 .multi-select > .no-items {
-  background-color: #994499;
 }
 
 .multi-select > .chooser {
   position: absolute;
+  max-height: 400px;
+  overflow-y: scroll;
 }
+
+.multi-select label,
+.multi-select input {
+  display: inline-block;
+  cursor: pointer;
+}
+

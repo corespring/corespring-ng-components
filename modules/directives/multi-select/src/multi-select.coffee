@@ -42,8 +42,10 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
 
   defaultRepeater = """<ul>
                       <li ng-repeat="o in options" >
+                        <label>
                         <input type="checkbox" ng-model="selectedArr[o.${uidKey}]" ng-click="toggleItem(o)"></input>
                         {{multiGetTitle(o)}}
+                        </label>
                       </li>
                     </ul>"""
 
@@ -100,7 +102,6 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
     Need to use $eval to support nested values
     ###
     scope.toggleItem = (i) ->
-
       getIndexById = (arr, item) ->
         for arrItem, index in arr
           if arrItem[uidKey] and arrItem[uidKey] == item[uidKey]
