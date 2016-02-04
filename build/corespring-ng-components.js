@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.12';
+  version = '0.0.13';
 
   angular.module('cs.services', []);
 
@@ -866,6 +866,13 @@
             }
           }
           return null;
+        };
+        scope.clearItems = function() {
+          Utils.applyValue(scope, modelProp, []);
+          updateSelection();
+          if (changeCallback != null) {
+            return scope[changeCallback]();
+          }
         };
         /*
         Need to use $eval to support nested values

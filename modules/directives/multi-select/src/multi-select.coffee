@@ -97,6 +97,11 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
 
       null
 
+    scope.clearItems = ->
+      Utils.applyValue(scope, modelProp, []);
+      updateSelection();
+      if changeCallback?
+        scope[changeCallback]()
 
     ###
     Need to use $eval to support nested values
