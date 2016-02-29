@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.13';
+  version = '0.0.14';
 
   angular.module('cs.services', []);
 
@@ -438,7 +438,6 @@
       }
       this.request.open("POST", this.url, true);
       this.request.setRequestHeader("Accept", "application/json");
-      this.request.setRequestHeader("Content-Type", "application/octet-stream");
       this.request.onload = function() {
         if ([200, 201, 202, 203, 204].indexOf(_this.request.status) === -1) {
           if (_this.options.onUploadFailed != null) {
@@ -483,6 +482,7 @@
       this.options = options;
       this.xhr = new com.ee.XHRWrapper(this.file, this.binaryData, this.url, this.name, this.options);
       this.xhr.setRequestHeader("Accept", "application/json");
+      this.xhr.setRequestHeader("Content-Type", "application/octet-stream");
     }
 
     RawFileUploader.prototype.beginUpload = function() {

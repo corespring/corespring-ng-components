@@ -36,7 +36,6 @@ class @com.ee.XHRWrapper
     @request.upload.addEventListener("abort", @options.onUploadCanceled, false) if @options.onUploadCanceled?
     @request.open "POST", @url, true
     @request.setRequestHeader "Accept", "application/json"
-    @request.setRequestHeader "Content-Type", "application/octet-stream"
 
     @request.onload = =>
       if [200..204].indexOf(@request.status) == -1
@@ -62,8 +61,8 @@ Place the binary data directly into the request body.
 class @com.ee.RawFileUploader
   constructor: (@file, @binaryData, @url, @name, @options) ->
     @xhr = new com.ee.XHRWrapper(@file, @binaryData, @url, @name, @options )
-    #@xhr.setRequestHeader 'content-type', "multipart/form-data; boundary=#{boundary}"
     @xhr.setRequestHeader "Accept", "application/json"
+    @xhr.setRequestHeader "Content-Type", "application/octet-stream"
   
   beginUpload: -> @xhr.beginUpload() 
 
