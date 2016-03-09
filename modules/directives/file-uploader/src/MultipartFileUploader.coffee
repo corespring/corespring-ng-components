@@ -26,6 +26,8 @@ class @com.ee.XHRWrapper
     now = new Date().getTime()
     @request = new XMLHttpRequest()
     @request.upload.index = 0
+    withCredentials = if @options.withCredentials? then @options.withCredentials else true
+    @request.withCredentials = withCredentials 
     @request.upload.file = @file
     @request.upload.downloadStartTime = now
     @request.upload.currentStart = now

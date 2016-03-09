@@ -412,7 +412,7 @@
 
   this.com.ee.XHRWrapper = (function() {
     function XHRWrapper(file, formBody, url, name, options) {
-      var now,
+      var now, withCredentials,
         _this = this;
       this.file = file;
       this.formBody = formBody;
@@ -422,6 +422,8 @@
       now = new Date().getTime();
       this.request = new XMLHttpRequest();
       this.request.upload.index = 0;
+      withCredentials = this.options.withCredentials != null ? this.options.withCredentials : true;
+      this.request.withCredentials = withCredentials;
       this.request.upload.file = this.file;
       this.request.upload.downloadStartTime = now;
       this.request.upload.currentStart = now;
