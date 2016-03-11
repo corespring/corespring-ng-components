@@ -405,6 +405,8 @@
 
   com.ee || (com.ee = {});
 
+  com.ee.v2 || (com.ee.v2 = {});
+
   /*
   Simplifies the xhr upload api
   */
@@ -419,6 +421,7 @@
       this.url = url;
       this.name = name;
       this.options = options;
+      this.options = this.options || {};
       now = new Date().getTime();
       this.request = new XMLHttpRequest();
       this.request.upload.index = 0;
@@ -462,11 +465,88 @@
       if (this.options.onLoadStart != null) {
         this.options.onLoadStart();
       }
-      this.request.sendAsBinary(this.formBody);
+      if (typeof this.formBody === 'string') {
+        this.request.sendAsBinary(this.formBody);
+      } else {
+        this.request.send(this.formBody);
+      }
       return null;
     };
 
     return XHRWrapper;
+
+  })();
+
+  this.com.ee.v2.RawFileUploader = (function() {
+    function RawFileUploader(file, url, name, options) {
+      var reader,
+        _this = this;
+      this.file = file;
+      this.url = url;
+      this.name = name;
+      this.options = options;
+      reader = new FileReader();
+      reader.onload = function(e) {
+        _this.binaryData = e.target.result;
+        _this.xhr = new com.ee.XHRWrapper(_this.file, _this.binaryData, _this.url, _this.name, _this.options);
+        _this.xhr.setRequestHeader("Accept", "application/json");
+        _this.xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        return _this.xhr.beginUpload();
+      };
+      reader.readAsArrayBuffer(this.file);
+    }
+
+    return RawFileUploader;
+
+  })();
+
+  /*
+  Build up a multipart form data request body
+  */
+
+
+  this.com.ee.v2.MultipartFileUploader = (function() {
+    function MultipartFileUploader(file, url, name, options) {
+      var reader,
+        _this = this;
+      this.file = file;
+      this.url = url;
+      this.name = name;
+      this.options = options;
+      reader = new FileReader();
+      reader.onload = function(e) {
+        var boundary, formBody;
+        _this.binaryData = e.target.result;
+        boundary = "------multipartformboundary-com-ee-mpfu";
+        _this.rawData = _this.mkBinaryString(_this.binaryData);
+        formBody = _this._buildMultipartFormBody(_this.file, _this.rawData, boundary);
+        _this.xhr = new com.ee.XHRWrapper(_this.file, formBody, _this.url, _this.name, _this.options);
+        _this.xhr.setRequestHeader('content-type', "multipart/form-data; boundary=" + boundary);
+        _this.xhr.setRequestHeader("Accept", "application/json");
+        return _this.xhr.beginUpload();
+      };
+      reader.readAsArrayBuffer(this.file);
+    }
+
+    MultipartFileUploader.prototype.mkBinaryString = function(buffer) {
+      return String.fromCharCode.apply(null, new Uint8Array(buffer));
+    };
+
+    MultipartFileUploader.prototype._buildMultipartFormBody = function(file, fileBinaryData, boundary) {
+      var fileParams, formBuilder, params;
+      formBuilder = new com.ee.MultipartFormBuilder(boundary);
+      params = this.options.additionalData;
+      fileParams = [
+        {
+          file: file,
+          data: fileBinaryData,
+          paramName: this.name
+        }
+      ];
+      return formBuilder.buildMultipartFormBody(params, fileParams, boundary);
+    };
+
+    return MultipartFileUploader;
 
   })();
 
