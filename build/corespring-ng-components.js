@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.14';
+  version = '0.0.17';
 
   angular.module('cs.services', []);
 
@@ -407,6 +407,22 @@
 
   com.ee.v2 || (com.ee.v2 = {});
 
+  com.ee.v2.binaryArrayToString = function(buffer) {
+    var CHUNK_SIZE, arr, index, length, result, slice;
+    arr = new Uint8Array(buffer);
+    CHUNK_SIZE = 0x8000;
+    index = 0;
+    length = arr.length;
+    result = '';
+    slice = null;
+    while (index < length) {
+      slice = arr.subarray(index, Math.min(index + CHUNK_SIZE, length));
+      result += String.fromCharCode.apply(null, slice);
+      index += CHUNK_SIZE;
+    }
+    return result;
+  };
+
   /*
   Simplifies the xhr upload api
   */
@@ -529,7 +545,7 @@
     }
 
     MultipartFileUploader.prototype.mkBinaryString = function(buffer) {
-      return String.fromCharCode.apply(null, new Uint8Array(buffer));
+      return com.ee.v2.binaryArrayToString(buffer);
     };
 
     MultipartFileUploader.prototype._buildMultipartFormBody = function(file, fileBinaryData, boundary) {
