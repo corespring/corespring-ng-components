@@ -17,6 +17,25 @@ window.com || (window.com = {})
 com.ee || (com.ee = {})
 com.ee.v2 || (com.ee.v2 = {})
 
+
+### 
+    Prevents a RangeError from occuring for large images.
+    see:  http://stackoverflow.com/questions/12710001/how-to-convert-uint8-array-to-base64-encoded-string/12713326#12713326
+###
+com.ee.v2.binaryArrayToString = (buffer) ->
+  arr = new Uint8Array(buffer)
+  CHUNK_SIZE = 0x8000 #arbitrary number
+  index = 0
+  length = arr.length
+  result = ''
+  slice = null
+  while index < length 
+    slice = arr.subarray(index, Math.min(index + CHUNK_SIZE, length))
+    result += String.fromCharCode.apply(null, slice)
+    index += CHUNK_SIZE
+  
+  result 
+
 ###
 Simplifies the xhr upload api
 ###
@@ -100,7 +119,7 @@ class @com.ee.v2.MultipartFileUploader
     
     reader.readAsArrayBuffer(@file)
   
-  mkBinaryString: (buffer) -> String.fromCharCode.apply(null, new Uint8Array(buffer))
+  mkBinaryString: (buffer) -> com.ee.v2.binaryArrayToString(buffer) 
 
   _buildMultipartFormBody: (file, fileBinaryData, boundary) ->
     formBuilder = new com.ee.MultipartFormBuilder(boundary)
