@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.18';
+  version = '0.0.19';
 
   angular.module('cs.services', []);
 
@@ -927,7 +927,7 @@
   angular.module('cs.directives').directive('multiSelect', [
     '$timeout', 'Utils', function($timeout, Utils) {
       var compile, defaultRepeater, definition, link, template;
-      defaultRepeater = "<ul>\n  <li ng-repeat=\"o in options\">\n    <input type=\"checkbox\" id=\"{{ '${inputId}-' + $index}}\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\">\n    <label for=\"{{ '${inputId}-' + $index}}\">{{multiGetTitle(o)}}</label>\n  </li>\n</ul>";
+      defaultRepeater = "<ul>\n  <li ng-repeat=\"o in options\">\n    <label>\n      <input type=\"checkbox\" ng-model=\"selectedArr[o.${uidKey}]\" ng-click=\"toggleItem(o)\">\n      {{multiGetTitle(o)}}\n    </label>\n  </li>\n</ul>";
       template = "<span class=\"multi-select\">\n ${summaryHtml}\n  <div class=\"chooser\" ng-show=\"showChooser\">\n   ${repeater}\n  </div>\n</span>";
       /*
       Linking function
@@ -1027,8 +1027,7 @@
       */
 
       compile = function(element, attrs, transclude) {
-        var instanceUid, outer, prepped, repeater, summaryHtml, uidKey;
-        instanceUid = "" + (Math.floor(Math.random() * 10000));
+        var outer, prepped, repeater, summaryHtml, uidKey;
         uidKey = attrs['multiUid'] || "key";
         outer = null;
         element.find(".summary").each(function() {
@@ -1046,7 +1045,7 @@
           throw "You need to add a summary node to the multi-select: eg: <div id='summary'>...</div>";
         }
         summaryHtml = summaryHtml.replace(/(<.*?)(>)/, "$1 ng-click='showChooser=!showChooser' $2");
-        prepped = template.replace("${repeater}", repeater).replace(/\$\{uidKey\}/g, uidKey).replace(/\$\{inputId\}/g, "" + instanceUid + "-" + uidKey).replace("${summaryHtml}", summaryHtml);
+        prepped = template.replace("${repeater}", repeater).replace(/\$\{uidKey\}/g, uidKey).replace("${summaryHtml}", summaryHtml);
         element.html(prepped);
         return link;
       };

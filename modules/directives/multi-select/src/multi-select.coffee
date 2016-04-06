@@ -42,8 +42,10 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
 
   defaultRepeater = """<ul>
                       <li ng-repeat="o in options">
-                        <input type="checkbox" id="{{ '${inputId}-' + $index}}" ng-model="selectedArr[o.${uidKey}]" ng-click="toggleItem(o)">
-                        <label for="{{ '${inputId}-' + $index}}">{{multiGetTitle(o)}}</label>
+                        <label>
+                          <input type="checkbox" ng-model="selectedArr[o.${uidKey}]" ng-click="toggleItem(o)">
+                          {{multiGetTitle(o)}}
+                        </label>
                       </li>
                     </ul>"""
 
@@ -144,9 +146,6 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
   ###
   compile = (element,attrs,transclude) ->
 
-
-    instanceUid = "#{Math.floor(Math.random() * 10000)}"
-
     uidKey = (attrs['multiUid'] || "key")
     outer = null
     element.find(".summary").each ->
@@ -168,7 +167,6 @@ angular.module('cs.directives').directive('multiSelect', ['$timeout', 'Utils', (
     prepped = template
       .replace("${repeater}", repeater)
       .replace(/\$\{uidKey\}/g, uidKey)
-      .replace(/\$\{inputId\}/g, "#{instanceUid}-#{uidKey}")
       .replace("${summaryHtml}", summaryHtml)
 
     element.html(prepped)
