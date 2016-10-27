@@ -13,7 +13,7 @@
     "bower": "*",
     "coffee-script": "*",
     "connect-assets": "*",
-    "corespring": "git+ssh://git@github.com/corespring/corespring-js#master",
+    "corespring": "corespring/corespring-js",
     "express": "~4.13.3",
     "grunt": "*",
     "grunt-cli": "*",
