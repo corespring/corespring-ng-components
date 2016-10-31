@@ -83,7 +83,7 @@
           theme = attrs["aceTheme"] || "eclipse";
           scope.editor.setTheme("ace/theme/" + theme);
           scope.$watch(attrs["aceMode"], function(newValue, oldValue) {
-            var AceMode, modeFactory;
+            var AceMode, factoryPath, modeFactory;
             if (newValue == null) {
               return;
             }
@@ -93,7 +93,8 @@
             if (newValue === "js") {
               newValue = "javascript";
             }
-            modeFactory = require("ace/mode/" + newValue);
+            factoryPath = "ace/mode/" + newValue;
+            modeFactory = require(factoryPath);
             if (modeFactory == null) {
               return;
             }
@@ -377,6 +378,126 @@
         addListener(dropbox, "dragleave", dragLeave, false);
         addListener(dropbox, "dragover", dragOver, false);
         return addListener(dropbox, "drop", drop, false);
+      }
+    };
+    return definition;
+  });
+
+  /*
+  file-uploader - a directive for providing a file upload utility.
+  
+  Usage:
+  	<a file-uploader fu-url="/file-upload" fu-name="my-file">add file</a>
+  
+    @params
+      fu-url (string or name of function on scope)
+      fu-name (the item name [only relevant for multipart upload])
+      fu-mode (raw|multipart [default: multipart]) 
+        raw places the data directly into the content body
+        multipart create the 'content flags' eg:  'content-disposition', 'boundary'
+      fu-max-size the max size in kB that a user can upload (default: 200)
+  
+  Events:
+    "uploadStarted"  (event) ->  : fired when uploading has started
+    "uploadCompleted" (event, serverResponse, serverStatus)-> : fired when uploading is completed
+  
+  Dependencies: JQuery
+  
+  TODO: Support file drag and drop
+  */
+
+
+  angular.module('cs.directives').directive('fileUploader', function($rootScope) {
+    var definition;
+    definition = {
+      replace: false,
+      link: function(scope, element, attrs) {
+        var $fuHiddenInput, createFileInput, fuUid, handleFileSelect, maxSize, maxSizeKb, mode, onLocalFileLoadEnd, uploadClick;
+        mode = "multipart";
+        if (attrs.fuMode === "raw") {
+          mode = "raw";
+        }
+        maxSizeKb = parseInt(attrs.fuMaxSize) || 200;
+        maxSize = maxSizeKb * 1024;
+        fuUid = "file_upload_input_" + (Math.round(Math.random() * 10000));
+        $fuHiddenInput = null;
+        uploadClick = function() {
+          return $fuHiddenInput.trigger('click');
+        };
+        createFileInput = function() {
+          var styleDef,
+            _this = this;
+          styleDef = "position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; visibility: hidden; padding: 0px; margin: 0px; line-height: 0px;";
+          scope.fileInput = "<input \n       type=\"file\" \n       id=\"" + fuUid + "\"\n       style=\"" + styleDef + "\" \n       name=\"" + attrs.fuName + "\">\n</input>";
+          $(element).parent().append(scope.fileInput);
+          $fuHiddenInput = $(element).parent().find("#" + fuUid);
+          $fuHiddenInput.change(function(event) {
+            return handleFileSelect(event);
+          });
+          return null;
+        };
+        handleFileSelect = function(event) {
+          var file, files, reader,
+            _this = this;
+          files = event.target.files;
+          file = event.target.files[0];
+          reader = new FileReader();
+          reader.onloadend = function(event) {
+            return onLocalFileLoadEnd(file, event);
+          };
+          reader.readAsBinaryString(file);
+          return null;
+        };
+        /*
+        Once the file has been read locally - invoke the Multipart File upload.
+        */
+
+        onLocalFileLoadEnd = function(file, event) {
+          var callback, name, options, uploader, url,
+            _this = this;
+          if (file.size > maxSize) {
+            if (scope[attrs["fuFileSizeGreaterThanMax"]] != null) {
+              scope[attrs["fuFileSizeGreaterThanMax"]](file, maxSizeKb);
+            }
+            $rootScope.$broadcast("fileSizeGreaterThanMax", file, maxSizeKb);
+            return;
+          }
+          url = attrs.fuUrl;
+          if (attrs.fuUrl.indexOf("()") !== -1) {
+            callback = attrs.fuUrl.replace("(", "").replace(")", "");
+            if (typeof scope[callback] === "function") {
+              url = scope[callback](file);
+            }
+          }
+          name = attrs.fuName;
+          options = {
+            onLoadStart: function() {
+              return $rootScope.$broadcast("uploadStarted");
+            },
+            onUploadComplete: function(responseText, status) {
+              var fnExpr;
+              fnExpr = attrs["fuUploadCompleted"];
+              if (fnExpr) {
+                if (fnExpr.indexOf('(') >= 0) {
+                  scope.$eval(fnExpr);
+                } else if (scope[fnExpr] != null) {
+                  scope[fnExpr](responseText, status);
+                }
+              }
+              return $rootScope.$broadcast("uploadCompleted", responseText, status);
+            }
+          };
+          if (mode === "raw") {
+            uploader = new com.ee.RawFileUploader(file, event.target.result, url, name, options);
+          } else {
+            uploader = new com.ee.MultipartFileUploader(file, event.target.result, url, name, options);
+          }
+          uploader.beginUpload();
+          return null;
+        };
+        createFileInput();
+        element.bind('click', uploadClick);
+        return null;
       }
     };
     return definition;
@@ -739,126 +860,6 @@
     return MultipartFormBuilder;
 
   })();
-
-  /*
-  file-uploader - a directive for providing a file upload utility.
-  
-  Usage:
-  	<a file-uploader fu-url="/file-upload" fu-name="my-file">add file</a>
-  
-    @params
-      fu-url (string or name of function on scope)
-      fu-name (the item name [only relevant for multipart upload])
-      fu-mode (raw|multipart [default: multipart]) 
-        raw places the data directly into the content body
-        multipart create the 'content flags' eg:  'content-disposition', 'boundary'
-      fu-max-size the max size in kB that a user can upload (default: 200)
-  
-  Events:
-    "uploadStarted"  (event) ->  : fired when uploading has started
-    "uploadCompleted" (event, serverResponse, serverStatus)-> : fired when uploading is completed
-  
-  Dependencies: JQuery
-  
-  TODO: Support file drag and drop
-  */
-
-
-  angular.module('cs.directives').directive('fileUploader', function($rootScope) {
-    var definition;
-    definition = {
-      replace: false,
-      link: function(scope, element, attrs) {
-        var $fuHiddenInput, createFileInput, fuUid, handleFileSelect, maxSize, maxSizeKb, mode, onLocalFileLoadEnd, uploadClick;
-        mode = "multipart";
-        if (attrs.fuMode === "raw") {
-          mode = "raw";
-        }
-        maxSizeKb = parseInt(attrs.fuMaxSize) || 200;
-        maxSize = maxSizeKb * 1024;
-        fuUid = "file_upload_input_" + (Math.round(Math.random() * 10000));
-        $fuHiddenInput = null;
-        uploadClick = function() {
-          return $fuHiddenInput.trigger('click');
-        };
-        createFileInput = function() {
-          var styleDef,
-            _this = this;
-          styleDef = "position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; visibility: hidden; padding: 0px; margin: 0px; line-height: 0px;";
-          scope.fileInput = "<input \n       type=\"file\" \n       id=\"" + fuUid + "\"\n       style=\"" + styleDef + "\" \n       name=\"" + attrs.fuName + "\">\n</input>";
-          $(element).parent().append(scope.fileInput);
-          $fuHiddenInput = $(element).parent().find("#" + fuUid);
-          $fuHiddenInput.change(function(event) {
-            return handleFileSelect(event);
-          });
-          return null;
-        };
-        handleFileSelect = function(event) {
-          var file, files, reader,
-            _this = this;
-          files = event.target.files;
-          file = event.target.files[0];
-          reader = new FileReader();
-          reader.onloadend = function(event) {
-            return onLocalFileLoadEnd(file, event);
-          };
-          reader.readAsBinaryString(file);
-          return null;
-        };
-        /*
-        Once the file has been read locally - invoke the Multipart File upload.
-        */
-
-        onLocalFileLoadEnd = function(file, event) {
-          var callback, name, options, uploader, url,
-            _this = this;
-          if (file.size > maxSize) {
-            if (scope[attrs["fuFileSizeGreaterThanMax"]] != null) {
-              scope[attrs["fuFileSizeGreaterThanMax"]](file, maxSizeKb);
-            }
-            $rootScope.$broadcast("fileSizeGreaterThanMax", file, maxSizeKb);
-            return;
-          }
-          url = attrs.fuUrl;
-          if (attrs.fuUrl.indexOf("()") !== -1) {
-            callback = attrs.fuUrl.replace("(", "").replace(")", "");
-            if (typeof scope[callback] === "function") {
-              url = scope[callback](file);
-            }
-          }
-          name = attrs.fuName;
-          options = {
-            onLoadStart: function() {
-              return $rootScope.$broadcast("uploadStarted");
-            },
-            onUploadComplete: function(responseText, status) {
-              var fnExpr;
-              fnExpr = attrs["fuUploadCompleted"];
-              if (fnExpr) {
-                if (fnExpr.indexOf('(') >= 0) {
-                  scope.$eval(fnExpr);
-                } else if (scope[fnExpr] != null) {
-                  scope[fnExpr](responseText, status);
-                }
-              }
-              return $rootScope.$broadcast("uploadCompleted", responseText, status);
-            }
-          };
-          if (mode === "raw") {
-            uploader = new com.ee.RawFileUploader(file, event.target.result, url, name, options);
-          } else {
-            uploader = new com.ee.MultipartFileUploader(file, event.target.result, url, name, options);
-          }
-          uploader.beginUpload();
-          return null;
-        };
-        createFileInput();
-        element.bind('click', uploadClick);
-        return null;
-      }
-    };
-    return definition;
-  });
 
   /*
    * loading-button

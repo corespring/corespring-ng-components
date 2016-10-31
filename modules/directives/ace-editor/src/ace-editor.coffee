@@ -66,7 +66,9 @@ angular.module('cs.directives').directive('aceEditor', ['$timeout', 'Utils', ($t
         return if !scope.editor?
 
         newValue = "javascript" if newValue == "js"
-        modeFactory = require("ace/mode/#{newValue}")
+        factoryPath = "ace/mode/#{newValue}";
+        #make path for require a var to help webpack
+        modeFactory = require(factoryPath);
         return if !modeFactory?
           
         AceMode = modeFactory.Mode
