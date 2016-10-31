@@ -4,6 +4,7 @@
   "version": "0.0.19",
   "description": "some angular components by corespring",
   "homepage": "http://github.com/corespring/corespring-ng-components",
+  "main" : "build/corespring-ng-components",
   "repository": {
     "type": "git",
     "url": "https://github.com/corespring/corespring-ng-components.git"
