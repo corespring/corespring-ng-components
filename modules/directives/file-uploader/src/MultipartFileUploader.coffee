@@ -39,7 +39,7 @@ com.ee.v2.binaryArrayToString = (buffer) ->
 ###
 Simplifies the xhr upload api
 ###
-class @com.ee.XHRWrapper
+class com.ee.XHRWrapper
 
   constructor: (@file, @formBody, @url, @name, @options) ->
 
@@ -84,7 +84,7 @@ class @com.ee.XHRWrapper
 
     null
 
-class @com.ee.v2.RawFileUploader
+class com.ee.v2.RawFileUploader
   
   constructor: (@file, @url, @name, @options) ->
     reader = new FileReader()
@@ -101,7 +101,7 @@ class @com.ee.v2.RawFileUploader
 ###
 Build up a multipart form data request body
 ###
-class @com.ee.v2.MultipartFileUploader
+class com.ee.v2.MultipartFileUploader
 
   constructor: (@file, @url, @name, @options) ->
     
@@ -134,7 +134,7 @@ class @com.ee.v2.MultipartFileUploader
 ###
 Place the binary data directly into the request body.
 ###
-class @com.ee.RawFileUploader
+class @om.ee.RawFileUploader
   constructor: (@file, @binaryData, @url, @name, @options) ->
     @xhr = new com.ee.XHRWrapper(@file, @binaryData, @url, @name, @options )
     @xhr.setRequestHeader "Accept", "application/json"
@@ -146,7 +146,7 @@ class @com.ee.RawFileUploader
 ###
 Build up a multipart form data request body
 ###
-class @com.ee.MultipartFileUploader
+class com.ee.MultipartFileUploader
   constructor: (@file, @binaryData, @url, @name, @options) ->
     uid = Math.floor( Math.random() * 100000 )
     boundary = "------multipartformboundary#{uid}"

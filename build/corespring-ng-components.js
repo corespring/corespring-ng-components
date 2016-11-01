@@ -1,7 +1,7 @@
 (function() {
   var version;
 
-  version = '0.0.19';
+  version = '0.0.20';
 
   angular.module('cs.services', []);
 
@@ -555,7 +555,7 @@
   */
 
 
-  this.com.ee.XHRWrapper = (function() {
+  com.ee.XHRWrapper = (function() {
     function XHRWrapper(file, formBody, url, name, options) {
       var now, withCredentials,
         _this = this;
@@ -620,7 +620,7 @@
 
   })();
 
-  this.com.ee.v2.RawFileUploader = (function() {
+  com.ee.v2.RawFileUploader = (function() {
     function RawFileUploader(file, url, name, options) {
       var reader,
         _this = this;
@@ -648,7 +648,7 @@
   */
 
 
-  this.com.ee.v2.MultipartFileUploader = (function() {
+  com.ee.v2.MultipartFileUploader = (function() {
     function MultipartFileUploader(file, url, name, options) {
       var reader,
         _this = this;
@@ -698,7 +698,7 @@
   */
 
 
-  this.com.ee.RawFileUploader = (function() {
+  this.om.ee.RawFileUploader = (function() {
     function RawFileUploader(file, binaryData, url, name, options) {
       this.file = file;
       this.binaryData = binaryData;
@@ -723,7 +723,7 @@
   */
 
 
-  this.com.ee.MultipartFileUploader = (function() {
+  com.ee.MultipartFileUploader = (function() {
     function MultipartFileUploader(file, binaryData, url, name, options) {
       var boundary, formBody, uid;
       this.file = file;
@@ -771,7 +771,7 @@
 
   com.ee || (com.ee = {});
 
-  this.com.ee.MultipartFormBuilder = (function() {
+  com.ee.MultipartFormBuilder = (function() {
     function MultipartFormBuilder(boundary) {
       this.boundary = boundary;
       this.dashdash = "--";

@@ -5,7 +5,7 @@ https://github.com/edeustace/inplace-image-changer
 window.com || (window.com = {})
 com.ee || (com.ee = {})
 
-class @com.ee.MultipartFormBuilder
+class com.ee.MultipartFormBuilder
 
   constructor: (@boundary) ->
     @dashdash = "--"
