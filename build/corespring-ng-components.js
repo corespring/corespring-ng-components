@@ -698,7 +698,7 @@
   */
 
 
-  this.om.ee.RawFileUploader = (function() {
+  com.ee.RawFileUploader = (function() {
     function RawFileUploader(file, binaryData, url, name, options) {
       this.file = file;
       this.binaryData = binaryData;
