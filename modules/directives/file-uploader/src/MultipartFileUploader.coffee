@@ -134,7 +134,7 @@ class com.ee.v2.MultipartFileUploader
 ###
 Place the binary data directly into the request body.
 ###
-class @om.ee.RawFileUploader
+class com.ee.RawFileUploader
   constructor: (@file, @binaryData, @url, @name, @options) ->
     @xhr = new com.ee.XHRWrapper(@file, @binaryData, @url, @name, @options )
     @xhr.setRequestHeader "Accept", "application/json"
